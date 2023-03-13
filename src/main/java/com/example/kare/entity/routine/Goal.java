@@ -1,5 +1,7 @@
 package com.example.kare.entity.routine;
 
+import com.example.kare.common.constant.ErrorCode;
+import com.example.kare.common.exception.KBException;
 import com.example.kare.domain.today.dto.GoalDto;
 import com.example.kare.entity.routine.constant.GoalUnit;
 import lombok.AccessLevel;
@@ -36,6 +38,6 @@ public class Goal {
         for(GoalUnit unit : GoalUnit.values()){
             if(unit == goalDto.getGoalUnit()) return;
         }
-        throw new RuntimeException("존재하지 않는 단위 입니다.");
+        throw new KBException("존재하지 않는 단위 입니다.", ErrorCode.BAD_REQUEST);
     }
 }

@@ -22,6 +22,9 @@ import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
+/**
+ * 실제 DB로 테스트할 때
+ */
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(locations = "classpath:application-test.yml")
 @Rollback(false)

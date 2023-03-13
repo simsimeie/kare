@@ -1,6 +1,7 @@
 package com.example.kare.domain.today.controller;
 
-import com.example.kare.domain.today.dto.CreateRoutineRequestDto;
+import com.example.kare.common.dto.ResponseDto;
+import com.example.kare.domain.today.dto.RoutineRequestDto;
 import com.example.kare.domain.today.service.TodayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,7 @@ public class TodayController {
     private final TodayService todayService;
 
     @PostMapping("/today/routine")
-    public Long createRoutine(@RequestBody @Valid CreateRoutineRequestDto requestDto){
-        return todayService.createRoutine(requestDto);
+    public ResponseDto<Long> createRoutine(@RequestBody @Valid RoutineRequestDto requestDto){
+        return ResponseDto.of(todayService.createRoutine(requestDto));
     }
 }

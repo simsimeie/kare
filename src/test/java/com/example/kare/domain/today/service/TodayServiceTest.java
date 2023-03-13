@@ -1,6 +1,7 @@
 package com.example.kare.domain.today.service;
 
-import com.example.kare.domain.today.dto.CreateRoutineRequestDto;
+import com.example.kare.common.exception.KBException;
+import com.example.kare.domain.today.dto.RoutineRequestDto;
 import com.example.kare.domain.today.dto.CycleDto;
 import com.example.kare.domain.today.dto.GoalDto;
 import com.example.kare.entity.routine.Routine;
@@ -23,8 +24,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.only;
 
 @ExtendWith(MockitoExtension.class)
 public class TodayServiceTest {
@@ -38,11 +37,11 @@ public class TodayServiceTest {
     @Test
     @DisplayName("존재하지 않는 회원ID로 루틴을 만들 때 Exception 발생 여부 테스트")
     public void notExistsMember_createRoutine_exception_test01(){
-        given(memberRepository.findById(any())).willReturn(null);
+        given(memberRepository.findById(any())).willReturn(Optional.empty());
 
-        Exception exception = assertThrows(RuntimeException.class, ()->{
+        Exception exception = assertThrows(KBException.class, ()->{
             // when
-            todayService.createRoutine(new CreateRoutineRequestDto());
+            todayService.createRoutine(new RoutineRequestDto());
         });
     }
 
@@ -51,25 +50,23 @@ public class TodayServiceTest {
     public void createRoutine_test01(){
         //given
         given(memberRepository.findById(any())).willReturn(Optional.of(MemberRepositoryTest.createNormalMemberForTest()));
-        CreateRoutineRequestDto createRoutineRequestDtoForTest = createRoutineRequestDtoForTest();
+        RoutineRequestDto routineRequestDtoForTest = createRoutineRequestDtoForTest();
         given(routineRepoistory.findRoutineDisplayLeastValue(any())).willReturn(1);
 
-        Routine routine = todayService.transformDtoToRoutine(createRoutineRequestDtoForTest);
+        Routine routine = todayService.transformDtoToRoutine(routineRequestDtoForTest);
         routine.setId(1L);
         given(routineRepoistory.save(any())).willReturn(routine);
 
         //when
-        Long routineId = todayService.createRoutine(createRoutineRequestDtoForTest);
+        Long routineId = todayService.createRoutine(routineRequestDtoForTest);
         assertEquals(1, routineId);
     }
 
 
-
-
-    public static CreateRoutineRequestDto createRoutineRequestDtoForTest(){
+    public static RoutineRequestDto createRoutineRequestDtoForTest(){
         CycleDto cycleDto = new CycleDto(CycleType.DAY, true, true, false, true, true, false, true);
 
-        return CreateRoutineRequestDto.of(
+        return RoutineRequestDto.of(
                 "미라클 모닝"
                 ,"member1"
                 ,true

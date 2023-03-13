@@ -24,7 +24,13 @@ import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * 슬라이스 테스트
+ */
 //@WebMvcTest(SignupController.class)
+/**
+ * 통합 테스트
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 class SignupControllerTest {
@@ -64,7 +70,7 @@ class SignupControllerTest {
         SignUpRequestDto nameIsNullMember = SignUpRequestDto.of("ABCDE", null, LocalDate.of(1989, Month.SEPTEMBER, 23), "01012341234", Sex.MALE);
         // when
         mvc.perform(
-                        post("/member/new")
+                        post("/signup/member")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(nameIsNullMember)))
                 // then
@@ -81,18 +87,21 @@ class SignupControllerTest {
         );
         //when
         mvc.perform(
-                        post("/member/new")
+                        post("/signup/member")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(createBasicSignupRequestData())))
                 // then
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value("uuid"))
-                .andExpect(jsonPath("$.ci").value("ABCDE"))
-                .andExpect(jsonPath("$.name").value("KYH"))
-                .andExpect(jsonPath("$.birthDate").value("2021-09-25"))
-                .andExpect(jsonPath("$.phoneNum").value("01012341234"))
-                .andExpect(jsonPath("$.sex").value(Sex.FEMALE.toString()))
+                .andExpect(jsonPath("$.ok").value(true))
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("성공"))
+                .andExpect(jsonPath("$.body.id").value("uuid"))
+                .andExpect(jsonPath("$.body.ci").value("ABCDE"))
+                .andExpect(jsonPath("$.body.name").value("KYH"))
+                .andExpect(jsonPath("$.body.birthDate").value("2021-09-25"))
+                .andExpect(jsonPath("$.body.phoneNum").value("01012341234"))
+                .andExpect(jsonPath("$.body.sex").value(Sex.FEMALE.toString()))
                 .andDo(print());
         then(signupService).should(only()).signup(any());
     }

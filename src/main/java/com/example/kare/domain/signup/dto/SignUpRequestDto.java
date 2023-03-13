@@ -13,12 +13,12 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor(staticName = "of")
 public class SignUpRequestDto {
-    @NotEmpty
+    @NotEmpty(message = "CI 값은 필수 입니다.")
     private String ci;
-    @NotEmpty
+    @NotEmpty(message = "회원 이름은 필수 입니다.")
     private String name;
     private LocalDate birthDate;
-    @NotEmpty
+    @NotEmpty(message = "회원 핸드폰 번호는 필수 입니다.")
     private String phoneNum;
     private Sex sex;
 

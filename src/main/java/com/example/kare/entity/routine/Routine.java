@@ -10,6 +10,8 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Entity
@@ -25,6 +27,10 @@ public class Routine extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @OneToMany(mappedBy = "routine", orphanRemoval = true)
+    private List<LinkRoutineGroup> linkRoutineGroups = new ArrayList<>();
+
     private boolean alarm;
     @Embedded
     private Cycle cycle;
@@ -58,6 +64,11 @@ public class Routine extends BaseTimeEntity {
         routine.setDisplayOrder(Optional.ofNullable(displayOrder).orElse(1));
 
         return routine;
+    }
+
+    public void addRoutineToGroup(RoutineGroup group){
+        LinkRoutineGroup linkRoutineGroup = LinkRoutineGroup.createLinkRoutineGroup(this, group);
+        this.getLinkRoutineGroups().add(linkRoutineGroup);
     }
 
     public void setId(Long id){

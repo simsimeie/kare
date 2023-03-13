@@ -19,7 +19,7 @@ import java.time.LocalTime;
 @Setter
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
-public class CreateRoutineRequestDto {
+public class RoutineRequestDto {
     @NotBlank
     private String name;
     @NotEmpty

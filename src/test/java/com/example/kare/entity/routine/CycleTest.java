@@ -1,5 +1,6 @@
 package com.example.kare.entity.routine;
 
+import com.example.kare.common.exception.KBException;
 import com.example.kare.domain.today.dto.CycleDto;
 import com.example.kare.entity.routine.constant.CycleType;
 import org.junit.jupiter.api.DisplayName;
@@ -48,7 +49,7 @@ public class CycleTest {
         //given
         CycleDto cycleDto = new CycleDto(CycleType.TIMES, null);
         //when
-        Exception exception = assertThrows(RuntimeException.class , () -> cycleDto.toEntity());
+        Exception exception = assertThrows(KBException.class , () -> cycleDto.toEntity());
     }
 
     @Test
@@ -57,7 +58,7 @@ public class CycleTest {
         //given
         CycleDto cycleDto = new CycleDto(CycleType.DAY, false,false,false,false,false,false,false);
         //when
-        Exception exception = assertThrows(RuntimeException.class , () -> cycleDto.toEntity());
+        Exception exception = assertThrows(KBException.class , () -> cycleDto.toEntity());
     }
 
 }

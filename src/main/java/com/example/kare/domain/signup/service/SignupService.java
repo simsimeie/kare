@@ -1,5 +1,7 @@
 package com.example.kare.domain.signup.service;
 
+import com.example.kare.common.constant.ErrorCode;
+import com.example.kare.common.exception.KBException;
 import com.example.kare.entity.member.Member;
 import com.example.kare.domain.signup.dto.SignUpRequestDto;
 import com.example.kare.domain.signup.dto.SignUpResponseDto;
@@ -22,7 +24,7 @@ public class SignupService {
     public SignUpResponseDto signup(SignUpRequestDto signUpRequestDto){
         Optional<Member> alreadyExistMember = Optional.ofNullable(memberRepository.findMemberByCi(signUpRequestDto.getCi()));
         if(alreadyExistMember.isPresent()){
-            throw new RuntimeException();
+            throw new KBException("이미 가입한 회원정보가 존재합니다.", ErrorCode.BAD_REQUEST);
         }
         Member member = signUpRequestDto.toEntity();
         return new SignUpResponseDto(memberRepository.save(member));

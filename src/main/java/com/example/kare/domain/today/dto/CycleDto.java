@@ -22,8 +22,8 @@ public class CycleDto {
     private boolean fri;
     private boolean sat;
     private boolean sun;
-    @Max(7)
-    @Min(1)
+    @Max(value = 7, message = "주별 회수의 최대 값은 7 입니다.")
+    @Min(value = 1, message = "주별 회수의 최소 값은 1 입니다.")
     private Integer count;
 
     public CycleDto(CycleType cycleType, boolean mon, boolean tue, boolean wed, boolean thu, boolean fri, boolean sat, boolean sun) {

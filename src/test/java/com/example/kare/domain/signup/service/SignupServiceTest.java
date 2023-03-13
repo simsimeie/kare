@@ -1,5 +1,6 @@
 package com.example.kare.domain.signup.service;
 
+import com.example.kare.common.exception.KBException;
 import com.example.kare.entity.member.constant.Sex;
 import com.example.kare.domain.signup.dto.SignUpRequestDto;
 import com.example.kare.entity.member.Member;
@@ -26,11 +27,11 @@ class SignupServiceTest {
     @Mock
     private MemberRepository memberRepository;
     @Test
-    @DisplayName("중복된 CI의 고객이 가입 시도할 때 이미 존재하는 회원이므로 RuntimeException 발생하는지 테스트")
+    @DisplayName("중복된 CI의 고객이 가입 시도할 때 이미 존재하는 회원이므로 KBException 발생하는지 테스트")
     public void ciDuplicationTest(){
         given(memberRepository.findMemberByCi(any())).willReturn(Member.createMember("temp","김", LocalDate.now(), "01012341234", Sex.MALE));
 
-        Exception exception = assertThrows(RuntimeException.class, ()->{
+        Exception exception = assertThrows(KBException.class, ()->{
             // when
             signupService.signup(createBasicSignupRequestData());
         });
