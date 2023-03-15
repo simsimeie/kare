@@ -27,10 +27,9 @@ public class Routine extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
-
-    @OneToMany(mappedBy = "routine", orphanRemoval = true)
-    private List<LinkRoutineGroup> linkRoutineGroups = new ArrayList<>();
-
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name="link_routine_group_id")
+    private LinkRoutineGroup linkRoutineGroup;
     private boolean alarm;
     @Embedded
     private Cycle cycle;
@@ -41,6 +40,7 @@ public class Routine extends BaseTimeEntity {
     private LocalDate endDate;
     private Integer displayOrder;
 
+    // ******** 생성 함수 ********
     public static Routine createRoutine(
             String name,
             Member member,
@@ -66,13 +66,14 @@ public class Routine extends BaseTimeEntity {
         return routine;
     }
 
+    // ******** 비즈니스 로직 ********
     public void addRoutineToGroup(RoutineGroup group){
         LinkRoutineGroup linkRoutineGroup = LinkRoutineGroup.createLinkRoutineGroup(this, group);
-        this.getLinkRoutineGroups().add(linkRoutineGroup);
+        this.setLinkRoutineGroup(linkRoutineGroup);
+        group.getLinkRoutineGroups().add(linkRoutineGroup);
     }
-
-    public void setId(Long id){
-        this.id = id;
+    public void clearRoutineGroup(){
+        this.setLinkRoutineGroup(null);
     }
 
 

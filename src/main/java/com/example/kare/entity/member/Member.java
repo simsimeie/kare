@@ -25,13 +25,12 @@ public class Member extends BaseTimeEntity {
     private String phoneNum;
     @Enumerated(EnumType.STRING)
     private Sex sex;
-
     @PrePersist
     private void generateMemberId(){
         this.id = UUID.randomUUID().toString();
     }
 
-
+    // ******** 생성 함수 ********
     public static Member createMember(String ci, String name, LocalDate birthDate, String phoneNum, Sex sex) {
         Member member = new Member();
         member.setCi(ci);

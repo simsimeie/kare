@@ -6,8 +6,6 @@ import com.example.kare.entity.routine.constant.CycleType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Executable;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CycleTest {

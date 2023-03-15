@@ -15,17 +15,16 @@ import javax.persistence.*;
 public class LinkRoutineGroup extends BaseTimeEntity {
     @Id
     @GeneratedValue
-    @Column
+    @Column(name="link_routine_group_id")
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="routine_id")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "linkRoutineGroup")
     private Routine routine;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="routine_group_id")
     private RoutineGroup group;
     private Integer displayOrder;
 
+    // ******** 생성 함수 ********
     public static LinkRoutineGroup createLinkRoutineGroup(Routine routine, RoutineGroup group){
         LinkRoutineGroup linkRoutineGroup = new LinkRoutineGroup();
         linkRoutineGroup.setRoutine(routine);

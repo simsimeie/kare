@@ -38,7 +38,7 @@ public class MemberRepositoryTest {
     @Test
     @DisplayName("회원 데이터 저장 테스트")
     public void saveMemberTest01(){
-        Member member = Member.createMember("ABCDE","KYH", LocalDate.of(2021, Month.SEPTEMBER, 25), "01012341234", Sex.FEMALE);
+        Member member = createMemberForTest();
         Member saved = memberRepository.save(member);
         assertEquals(saved.getId(), member.getId());
     }
@@ -46,13 +46,13 @@ public class MemberRepositoryTest {
     @Test
     @DisplayName("CI 값으로 회원을 조회하는 테스트")
     public void findMemberTest01(){
-        Member member = Member.createMember("ABCDE","KYH", LocalDate.of(2021, Month.SEPTEMBER, 25), "01012341234", Sex.FEMALE);
+        Member member = createMemberForTest();
         memberRepository.save(member);
         Member memberByCi = memberRepository.findMemberByCi(member.getCi());
         assertEquals(memberByCi.getId(), member.getId());
     }
 
-    public static Member createNormalMemberForTest(){
-        return Member.createMember("ABCDE","KYH", LocalDate.of(2021, Month.SEPTEMBER, 25), "01012341234", Sex.FEMALE);
+    public static Member createMemberForTest(){
+        return Member.createMember("ABCDE","test_member", LocalDate.of(2021, Month.SEPTEMBER, 25), "01012341234", Sex.FEMALE);
     }
 }

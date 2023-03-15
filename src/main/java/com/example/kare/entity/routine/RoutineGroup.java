@@ -1,6 +1,7 @@
 package com.example.kare.entity.routine;
 
 import com.example.kare.entity.BaseTimeEntity;
+import com.example.kare.entity.member.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,18 @@ public class RoutineGroup extends BaseTimeEntity {
     @Column(name = "routine_group_id")
     private Long id;
     private String name;
-    @OneToMany(mappedBy = "group", orphanRemoval = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="member_id")
+    private Member member;
+    @OneToMany(mappedBy = "group")
     private List<LinkRoutineGroup> linkRoutineGroups = new ArrayList<>();
+
+    // ******** 생성 함수 ********
+    public static RoutineGroup createRoutineGroup(Member member, String name){
+        RoutineGroup routineGroup = new RoutineGroup();
+        routineGroup.setMember(member);
+        routineGroup.setName(name);
+        return routineGroup;
+    }
 
 }

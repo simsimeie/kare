@@ -1,8 +1,8 @@
 package com.example.kare.repository;
 
+import com.example.kare.entity.routine.RoutineGroup;
 import com.example.kare.entity.routine.constant.CycleType;
 import com.example.kare.entity.routine.constant.GoalUnit;
-import com.example.kare.entity.member.constant.Sex;
 import com.example.kare.entity.routine.Cycle;
 import com.example.kare.entity.routine.Goal;
 import com.example.kare.entity.member.Member;
@@ -18,7 +18,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.Month;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
@@ -28,48 +28,78 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(locations = "classpath:application-test.yml")
 @Rollback(false)
-class RoutineRepoistoryTest {
+public class RoutineRepositoryTest {
     private final RoutineRepoistory routineRepoistory;
+    private MemberRepository memberRepository;
     private final TestEntityManager em;
     @Autowired
-    private MemberRepository memberRepository;
+    private RoutineGroupRepository routineGroupRepository;
 
-    public RoutineRepoistoryTest(
+    public RoutineRepositoryTest(
             @Autowired RoutineRepoistory routineRepoistory
+            ,@Autowired MemberRepository memberRepository
             ,@Autowired TestEntityManager entityManager
     ){
         this.routineRepoistory = routineRepoistory;
+        this.memberRepository = memberRepository;
         this.em = entityManager;
     }
 
     @Test
     @DisplayName("루틴이 정상적으로 저장되는지 테스트")
     public void routineSaveTest01(){
-        Member member = Member.createMember("ABCDE","KYH", LocalDate.of(2021, Month.SEPTEMBER, 25), "01012341234", Sex.FEMALE);
+        Member member = MemberRepositoryTest.createMemberForTest();
         memberRepository.save(member);
 
-        Cycle cycle = new Cycle(CycleType.DAY, true, true, true, true, true, true, false);
-        Goal goal = new Goal(1, GoalUnit.TIMES);
         Integer displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
 
-        Routine routine = Routine.createRoutine("미라클모닝", member,false, cycle, goal, LocalTime.of(5,0), LocalDate.now(), null, displayLeastValue);
+        Routine routine = createRoutineForTest(member, displayLeastValue);
 
         Routine savedRoutine = routineRepoistory.save(routine);
         assertEquals(savedRoutine.getId(), routine.getId());
     }
 
     @Test
+    @DisplayName("루틴과 루틴그룹이 정상적으로 저장되는지 테스트")
+    public void routineSaveTest02(){
+        //given
+        Member member = MemberRepositoryTest.createMemberForTest();
+        memberRepository.save(member);
+
+        Integer displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+
+        Routine routine = createRoutineForTest(member, displayLeastValue);
+
+        routineRepoistory.save(routine);
+
+        RoutineGroup routineGroupForTest = RoutineGroupRepositoryTest.createRoutineGroupForTest(member);
+
+        routineGroupRepository.save(routineGroupForTest);
+
+        routine.addRoutineToGroup(routineGroupForTest);
+
+        //when
+        Routine savedRoutine = routineRepoistory.save(routine);
+
+        //then
+        assertEquals(savedRoutine.getId(), routine.getId());
+        assertEquals(savedRoutine.getLinkRoutineGroup().getGroup().getId(), routineGroupForTest.getId());
+        assertEquals(savedRoutine.getLinkRoutineGroup().getGroup().getName(), routineGroupForTest.getName());
+
+
+
+    }
+
+    @Test
     @DisplayName("회원이 등록한 루틴 display order 값 중 가장 작은 값을 정상적으로 가져오는지 테스트")
     public void findRoutineMinDisplayOrderTest01(){
         //given
-        Member member = Member.createMember("ABCDE","KYH", LocalDate.of(2021, Month.SEPTEMBER, 25), "01012341234", Sex.FEMALE);
+        Member member = MemberRepositoryTest.createMemberForTest();
         memberRepository.save(member);
 
-        Cycle cycle = new Cycle(CycleType.DAY, true, true, true, true, true, true, false);
-        Goal goal = new Goal(1, GoalUnit.TIMES);
         Integer displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
 
-        Routine routine = Routine.createRoutine("미라클모닝",member,false, cycle, goal, LocalTime.of(5,0), LocalDate.now(), null, 1  );
+        Routine routine = createRoutineForTest(member, displayLeastValue);
         routineRepoistory.save(routine);
 
         //when
@@ -82,7 +112,7 @@ class RoutineRepoistoryTest {
     @DisplayName("회원이 등록한 루틴이 없을 때 Display least value 값으로 null을 가져오는지 테스트")
     public void findRoutineMinDisplayOrderTest02(){
         //given
-        Member member = Member.createMember("ABCDE","KYH", LocalDate.of(2021, Month.SEPTEMBER, 25), "01012341234", Sex.FEMALE);
+        Member member = MemberRepositoryTest.createMemberForTest();
         memberRepository.save(member);
 
         //when
@@ -95,14 +125,12 @@ class RoutineRepoistoryTest {
     @DisplayName("회원이 루틴을 처음 등록할 때 Display least value 값으로 1 가져오는지 테스트")
     public void findRoutineMinDisplayOrderTest03(){
         //given
-        Member member = Member.createMember("ABCDE","KYH", LocalDate.of(2021, Month.SEPTEMBER, 25), "01012341234", Sex.FEMALE);
+        Member member = MemberRepositoryTest.createMemberForTest();
         memberRepository.save(member);
 
-        Cycle cycle = new Cycle(CycleType.DAY, true, true, true, true, true, true, false);
-        Goal goal = new Goal(1, GoalUnit.TIMES);
         Integer displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
 
-        Routine routine = Routine.createRoutine("미라클모닝",member,false, cycle, goal, LocalTime.of(5,0), LocalDate.now(), null, displayLeastValue );
+        Routine routine = createRoutineForTest(member, displayLeastValue);
         routineRepoistory.save(routine);
 
         //when
@@ -115,36 +143,69 @@ class RoutineRepoistoryTest {
     @DisplayName("루틴의 display order 최소 값 가져오는 거래를 여러번 호출 테스트")
     public void severalTimeRequestMinDisplayValueTest(){
         //given
-        Member member = Member.createMember("ABCDE","KYH", LocalDate.of(2021, Month.SEPTEMBER, 25), "01012341234", Sex.FEMALE);
+        Member member = MemberRepositoryTest.createMemberForTest();
         memberRepository.save(member);
 
-        Cycle cycle = new Cycle(CycleType.DAY, true, true, true, true, true, true, false);
-        Goal goal = new Goal(1, GoalUnit.TIMES);
 
         Integer displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
-        Routine routine = Routine.createRoutine("미라클모닝",member,false, cycle, goal, LocalTime.of(5,0), LocalDate.now(), null, displayLeastValue );
+        Routine routine = createRoutineForTest(member, displayLeastValue);
         routineRepoistory.save(routine);
         displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
-        routine = Routine.createRoutine("미라클모닝",member,false, cycle, goal, LocalTime.of(5,0), LocalDate.now(), null, displayLeastValue );
+        routine = createRoutineForTest(member, displayLeastValue);
         routineRepoistory.save(routine);
         displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
-        routine = Routine.createRoutine("미라클모닝",member,false, cycle, goal, LocalTime.of(5,0), LocalDate.now(), null, displayLeastValue );
+        routine = createRoutineForTest(member, displayLeastValue);
         routineRepoistory.save(routine);
+        assertEquals(-1, displayLeastValue);
         displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
-        routine = Routine.createRoutine("미라클모닝",member,false, cycle, goal, LocalTime.of(5,0), LocalDate.now(), null, displayLeastValue );
+        routine = createRoutineForTest(member, displayLeastValue);
         routineRepoistory.save(routine);
+        assertEquals(-2, displayLeastValue);
         displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
-        routine = Routine.createRoutine("미라클모닝",member,false, cycle, goal, LocalTime.of(5,0), LocalDate.now(), null, displayLeastValue );
+        routine = createRoutineForTest(member, displayLeastValue);
         routineRepoistory.save(routine);
         assertEquals(-3, displayLeastValue);
         displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
-        routine = Routine.createRoutine("미라클모닝",member,false, cycle, goal, LocalTime.of(5,0), LocalDate.now(), null, displayLeastValue );
+        routine = createRoutineForTest(member, displayLeastValue);
         routineRepoistory.save(routine);
+        assertEquals(-4, displayLeastValue);
         displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
-        routine = Routine.createRoutine("미라클모닝",member,false, cycle, goal, LocalTime.of(5,0), LocalDate.now(), null, displayLeastValue );
+        routine = createRoutineForTest(member, displayLeastValue);
         routineRepoistory.save(routine);
         assertEquals(-5, displayLeastValue);
 
     }
 
+    @Test
+    @DisplayName("루틴 삭제 테스트")
+    public void deleteRoutineTest01(){
+        //given
+        Member member = MemberRepositoryTest.createMemberForTest();
+        memberRepository.save(member);
+        Integer displayOrder = routineRepoistory.findRoutineDisplayLeastValue(member);
+        Routine routine = RoutineRepositoryTest.createRoutineForTest(member,displayOrder);
+        routineRepoistory.save(routine);
+
+        //when
+        routineRepoistory.delete(routine);
+        //then
+        assertEquals(Optional.empty(), routineRepoistory.findById(routine.getId()));
+    }
+
+
+    public static Routine createRoutineForTest(Member member, Integer displayLeastValue) {
+        Cycle cycle = new Cycle(CycleType.DAY, true, true, true, true, true, true, false);
+        Goal goal = new Goal(1, GoalUnit.TIMES);
+
+        return Routine.createRoutine(
+                "미라클모닝"
+                , member
+                , false
+                , cycle, goal
+                , LocalTime.of(5, 0)
+                , LocalDate.now()
+                , null
+                , displayLeastValue);
+
+    }
 }

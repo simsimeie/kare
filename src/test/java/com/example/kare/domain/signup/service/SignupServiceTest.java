@@ -5,6 +5,7 @@ import com.example.kare.entity.member.constant.Sex;
 import com.example.kare.domain.signup.dto.SignUpRequestDto;
 import com.example.kare.entity.member.Member;
 import com.example.kare.repository.MemberRepository;
+import com.example.kare.repository.MemberRepositoryTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +30,7 @@ class SignupServiceTest {
     @Test
     @DisplayName("중복된 CI의 고객이 가입 시도할 때 이미 존재하는 회원이므로 KBException 발생하는지 테스트")
     public void ciDuplicationTest(){
-        given(memberRepository.findMemberByCi(any())).willReturn(Member.createMember("temp","김", LocalDate.now(), "01012341234", Sex.MALE));
+        given(memberRepository.findMemberByCi(any())).willReturn(MemberRepositoryTest.createMemberForTest());
 
         Exception exception = assertThrows(KBException.class, ()->{
             // when
