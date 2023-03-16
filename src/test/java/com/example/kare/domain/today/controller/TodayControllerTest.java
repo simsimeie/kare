@@ -4,7 +4,7 @@ import com.example.kare.domain.today.dto.LinkRoutineGroupRequestDto;
 import com.example.kare.domain.today.dto.RoutineGroupRequestDto;
 import com.example.kare.domain.today.dto.RoutineRequestDto;
 import com.example.kare.domain.today.service.TodayService;
-import com.example.kare.domain.today.service.TodayServiceTest;
+import com.example.kare.domain.today.service.TodayServiceMockTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,7 @@ class TodayControllerTest {
     @DisplayName("루틴이 정상적으로 저장되는지 테스트")
     public void createRoutineTest01() throws Exception {
         RoutineRequestDto routineRequestDtoForTest =
-                TodayServiceTest.createRoutineRequestDtoForTest();
+                TodayServiceMockTest.createRoutineRequestDtoForTest();
         given(todayService.createRoutine(any())).willReturn(1L);
 
 
@@ -69,7 +69,7 @@ class TodayControllerTest {
     @DisplayName("루틴의 이름이 없을 때 Validation Exception 발생하는지 테스트")
     public void createRoutineValidationTest01() throws Exception {
         RoutineRequestDto routineRequestDtoForTest
-                = TodayServiceTest.createRoutineRequestDtoForTest();
+                = TodayServiceMockTest.createRoutineRequestDtoForTest();
         routineRequestDtoForTest.setName("");
 
         // when
@@ -86,7 +86,7 @@ class TodayControllerTest {
     @DisplayName("루틴의 목표량을 7자리 초과 정수로 설정했을 때, Validation Exception 발생하는지 테스트")
     public void createRoutineValidationTest02() throws Exception {
         RoutineRequestDto routineRequestDtoForTest
-                = TodayServiceTest.createRoutineRequestDtoForTest();
+                = TodayServiceMockTest.createRoutineRequestDtoForTest();
         routineRequestDtoForTest.getGoal().setGoalValue(10000000);
 
         // when
@@ -104,7 +104,7 @@ class TodayControllerTest {
     @DisplayName("루틴의 주별 회수를 1미만으로 설정했을 때, Validation Exception 발생하는지 테스트")
     public void createRoutineValidationTest03() throws Exception {
         RoutineRequestDto routineRequestDtoForTest
-                = TodayServiceTest.createRoutineRequestDtoForTest();
+                = TodayServiceMockTest.createRoutineRequestDtoForTest();
         routineRequestDtoForTest.getCycle().setCount(0);
         // when
         mvc.perform(
@@ -120,7 +120,7 @@ class TodayControllerTest {
     @DisplayName("루틴의 주별 회수를 7초과로 했을 때, Exception 발생하는지 테스트")
     public void createRoutineValidationTest04() throws Exception {
         RoutineRequestDto routineRequestDtoForTest
-                = TodayServiceTest.createRoutineRequestDtoForTest();
+                = TodayServiceMockTest.createRoutineRequestDtoForTest();
         routineRequestDtoForTest.getCycle().setCount(8);
         // when
         mvc.perform(

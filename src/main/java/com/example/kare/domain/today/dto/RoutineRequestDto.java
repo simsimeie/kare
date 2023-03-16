@@ -12,6 +12,7 @@ import lombok.Setter;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -20,6 +21,8 @@ import java.time.LocalTime;
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
 public class RoutineRequestDto {
+    @Positive
+    private Long routineId;
     @NotBlank
     private String name;
     @NotEmpty
@@ -30,6 +33,17 @@ public class RoutineRequestDto {
     private LocalTime alarmTime;
     private LocalDate startDate;
     private LocalDate endDate;
+
+    public RoutineRequestDto(String name, String memberId, boolean alarm, CycleDto cycle, GoalDto goal, LocalTime alarmTime, LocalDate startDate, LocalDate endDate) {
+        this.name = name;
+        this.memberId = memberId;
+        this.alarm = alarm;
+        this.cycle = cycle;
+        this.goal = goal;
+        this.alarmTime = alarmTime;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 
     public Routine toEntity(Member member, Integer displayOrder){
 

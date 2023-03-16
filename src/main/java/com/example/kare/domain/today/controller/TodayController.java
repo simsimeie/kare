@@ -5,11 +5,9 @@ import com.example.kare.domain.today.dto.RoutineGroupRequestDto;
 import com.example.kare.domain.today.dto.RoutineRequestDto;
 import com.example.kare.domain.today.service.TodayService;
 import com.example.kare.domain.today.dto.LinkRoutineGroupRequestDto;
+import com.example.kare.entity.routine.RoutineHistory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -23,7 +21,10 @@ public class TodayController {
         return ResponseDto.of(todayService.createRoutine(requestDto));
     }
 
-
+    @PutMapping("/today/routine")
+    public ResponseDto<Long> modifyRoutine(@RequestBody @Valid RoutineRequestDto requestDto){
+        return ResponseDto.of(todayService.modifyRoutine(requestDto));
+    }
 
     @PostMapping("/today/routine-group")
     public ResponseDto<Long> createRoutineGroup(@RequestBody @Valid RoutineGroupRequestDto requestDto){

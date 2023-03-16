@@ -24,12 +24,14 @@ public class LinkRoutineGroup extends BaseTimeEntity {
     private RoutineGroup group;
     private Integer displayOrder;
 
+
     // ******** 생성 함수 ********
     public static LinkRoutineGroup createLinkRoutineGroup(Routine routine, RoutineGroup group){
         LinkRoutineGroup linkRoutineGroup = new LinkRoutineGroup();
         linkRoutineGroup.setRoutine(routine);
         linkRoutineGroup.setGroup(group);
-        //linkRoutineGroup.setDisplayOrder(0);
+        linkRoutineGroup.setDisplayOrder(0);
+
         return linkRoutineGroup;
     }
 

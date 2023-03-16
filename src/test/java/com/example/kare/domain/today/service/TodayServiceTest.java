@@ -1,168 +1,102 @@
 package com.example.kare.domain.today.service;
 
 import com.example.kare.common.exception.KBException;
-import com.example.kare.domain.today.dto.*;
+import com.example.kare.domain.today.dto.CycleDto;
+import com.example.kare.domain.today.dto.GoalDto;
+import com.example.kare.domain.today.dto.RoutineRequestDto;
 import com.example.kare.entity.member.Member;
 import com.example.kare.entity.routine.Routine;
-import com.example.kare.entity.routine.RoutineGroup;
+import com.example.kare.entity.routine.RoutineHistory;
 import com.example.kare.entity.routine.constant.CycleType;
 import com.example.kare.entity.routine.constant.GoalUnit;
 import com.example.kare.repository.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.BDDMockito;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Optional;
+import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class TodayServiceTest {
-    @InjectMocks
-    private TodayService todayService;
-    @Mock
+    @Autowired
     private MemberRepository memberRepository;
-    @Mock
+    @Autowired
     private RoutineRepoistory routineRepoistory;
-    @Mock
-    private RoutineGroupRepository routineGroupRepository;
+    @Autowired
+    private TodayService todayService;
+    private Member member;
+    private Routine routine;
+    private RoutineRequestDto mockRoutineRequestDto;
+    @Autowired
+    private RoutineHistoryRepository routineHistoryRepository;
 
-    @Test
-    @DisplayName("존재하지 않는 회원ID로 루틴을 만들 때 Exception 발생 여부 테스트")
-    public void notExistsMember_createRoutine_exception_test01(){
-        //given
-        given(memberRepository.findById(any())).willReturn(Optional.empty());
+    @BeforeEach
+    public void init(){
+        member = MemberRepositoryTest.createMemberForTest();
+        memberRepository.save(member);
 
-        //then
-        Exception exception = assertThrows(KBException.class, ()->{
-            // when
-            todayService.createRoutine(Mockito.mock(RoutineRequestDto.class));
-        });
+        CycleDto cycleDto = CycleDto.of(CycleType.DAY, true, true, true, true, true, true, false, null);
+        GoalDto goalDto = GoalDto.of(1, GoalUnit.TIMES);
+
+        routine = RoutineRepositoryTest.createRoutineForTest(member, 1);
+        routineRepoistory.save(routine);
+        mockRoutineRequestDto = Mockito.mock(RoutineRequestDto.class);
+        given(mockRoutineRequestDto.getRoutineId()).willReturn(routine.getId());
+        given(mockRoutineRequestDto.getName()).willReturn(routine.getName());
+        given(mockRoutineRequestDto.getGoal()).willReturn(goalDto);
+        given(mockRoutineRequestDto.getCycle()).willReturn(cycleDto);
+        given(mockRoutineRequestDto.getAlarmTime()).willReturn(routine.getAlarmTime());
+        given(mockRoutineRequestDto.getStartDate()).willReturn(routine.getStartDate());
     }
 
     @Test
-    @DisplayName("RoutineRequestDto가 Routine entity로 잘 변환되는지 테스트")
-    public void transform_RoutineRequestDtoToRoutine_test01(){
+    @DisplayName("루틴 이름만 바뀌어서 들어올 때(주기, 목표, 시작시간 외의 값), RoutineHistory 변경되지 않는지 테스트")
+    public void modifyRoutineTest01(){
         //given
-        given(memberRepository.findById(any())).willReturn(Optional.of(MemberRepositoryTest.createMemberForTest()));
-        RoutineRequestDto routineRequestDtoForTest = createRoutineRequestDtoForTest();
-        given(routineRepoistory.findRoutineDisplayLeastValue(any())).willReturn(1);
+        given(mockRoutineRequestDto.getName()).willReturn("미라클저녁");
+        RoutineHistory history = routineHistoryRepository.findLastHistoryByRoutineAndEndDate(routine, LocalDate.of(9999, 12, 31));
+        LocalDateTime lastModifiedDate = history.getLastModifiedDate();
 
         //when
-        Routine routine = todayService.transformRoutineRequestDtoToRoutine(routineRequestDtoForTest);
+        todayService.modifyRoutine(mockRoutineRequestDto);
+        RoutineHistory history2 = routineHistoryRepository.findLastHistoryByRoutineAndEndDate(routine, LocalDate.of(9999, 12, 31));
 
         //then
-        assertEquals("미라클 모닝", routine.getName());
-        assertEquals(true, routine.isAlarm());
-        assertEquals(CycleType.DAY, routine.getCycle().getCycleType());
-        assertEquals(true, routine.getCycle().isMon());
-        assertEquals(true, routine.getCycle().isTue());
-        assertEquals(false, routine.getCycle().isWed());
-        assertEquals(true, routine.getCycle().isThu());
-        assertEquals(true, routine.getCycle().isFri());
-        assertEquals(false, routine.getCycle().isSat());
-        assertEquals(true, routine.getCycle().isSun());
-        assertEquals(1, routine.getGoal().getGoalValue());
-        assertEquals(GoalUnit.TIMES, routine.getGoal().getGoalUnit());
-        assertEquals(LocalTime.of(5,0), routine.getAlarmTime());
-        assertEquals(LocalDate.now(), routine.getStartDate());
-        assertEquals(null, routine.getEndDate());
-        assertEquals( 1, routine.getDisplayOrder());
-
-    }
-    @Test
-    @DisplayName("존재하지 않는 회원ID로 루틴그룹을 만들 때 Exception 발생 여부 테스트")
-    public void notExistsMember_createRoutineGroup_exception_test01(){
-        //given
-        given(memberRepository.findById(any())).willReturn(Optional.empty());
-
-        //then
-        Exception exception = assertThrows(KBException.class, ()->{
-            // when
-            todayService.createRoutineGroup(Mockito.mock(RoutineGroupRequestDto.class));
-        });
+        assertEquals(history2.getLastModifiedDate(), lastModifiedDate);
     }
 
     @Test
-    @DisplayName("RoutineGroupRequestDto가 루틴그룹 엔티티로 잘 변환되는지 테스트")
-    public void transform_RoutineGroupRequestDtoToRoutineGroup_test01(){
+    @DisplayName("루틴 주기 변경되었을 때, RoutineHistory 변경되는지 테스트")
+    public void modifyRoutineTest02(){
         //given
-        given(memberRepository.findById(any())).willReturn(Optional.of(MemberRepositoryTest.createMemberForTest()));
-        RoutineGroupRequestDto routineGroupRequestDtoForTest = createRoutineGroupRequestDtoForTest();
+        CycleDto cycleDto = CycleDto.of(CycleType.DAY, true, true, true, false, true, true, false, null);
+
+        given(mockRoutineRequestDto.getCycle()).willReturn(cycleDto);
+        RoutineHistory history = routineHistoryRepository.findLastHistoryByRoutineAndEndDate(routine, LocalDate.of(9999, 12, 31));
+        LocalDateTime lastModifiedDate = history.getLastModifiedDate();
 
         //when
-        RoutineGroup routineGroup = todayService.transformRoutineGroupRequestDtoToRoutineGroup(routineGroupRequestDtoForTest);
+        todayService.modifyRoutine(mockRoutineRequestDto);
+        RoutineHistory history2 = routineHistoryRepository.findLastHistoryByRoutineAndEndDate(routine, LocalDate.of(9999, 12, 31));
 
         //then
-        assertEquals("테스트 그룹", routineGroup.getName());
-        assertEquals("test_member", routineGroup.getMember().getName());
+        assertNotEquals(history2.getLastModifiedDate(), lastModifiedDate);
+        assertEquals(false, history2.getCycle().isThu());
     }
 
     @Test
-    @DisplayName("RoutineGroupRequestDto에 존재하지 않은 routineId가 들어왔을 때, KBException 발생하는지 테스트")
-    public void routineIdIsInvalid_calllinkRoutineAndRoutineGroup_KBException_Test01(){
-        //given
-        given(routineRepoistory.findById(any())).willReturn(Optional.empty());
-        LinkRoutineGroupRequestDto mock = mock(LinkRoutineGroupRequestDto.class);
-        given(mock.getRoutineId()).willReturn(1L);
-        //then
-        Exception exception = assertThrows(KBException.class, ()->{
-            //when
-            todayService.linkRoutineAndRoutineGroup(mock);
-        });
-
-        //then
-        then(routineRepoistory).should(never()).save(any());
+    @DisplayName("과거날짜로 startDate를 변경했을 때, KB Exception 발생하는지 테스트")
+    public void modifyRoutineTest03(){
+        given(mockRoutineRequestDto.getStartDate()).willReturn(LocalDate.now().minusDays(1));
+        assertThrows(KBException.class, ()->todayService.modifyRoutine(mockRoutineRequestDto));
     }
-
-    @Test
-    @DisplayName("RoutineGroupRequestDto에 존재하지 않은 routineGroupId가 들어왔을 때, KBException 발생하는지 테스트")
-    public void routineGroupIdIsInvalid_calllinkRoutineAndRoutineGroup_KBException_Test01(){
-        //given
-        Member member = MemberRepositoryTest.createMemberForTest();
-        given(routineRepoistory.findById(any())).willReturn(Optional.of(Mockito.mock(Routine.class)));
-        given(routineGroupRepository.findById(any())).willReturn(Optional.empty());
-        LinkRoutineGroupRequestDto mock = mock(LinkRoutineGroupRequestDto.class);
-        given(mock.getRoutineGroupId()).willReturn(1L);
-        given(mock.getRoutineId()).willReturn(1L);
-
-        //then
-        Exception exception = assertThrows(KBException.class, ()->{
-            //when
-            todayService.linkRoutineAndRoutineGroup(mock);
-        });
-    }
-
-
-    public static RoutineRequestDto createRoutineRequestDtoForTest(){
-        CycleDto cycleDto = new CycleDto(CycleType.DAY, true, true, false, true, true, false, true);
-
-        return RoutineRequestDto.of(
-                "미라클 모닝"
-                ,"test_member"
-                ,true
-                , cycleDto
-                , GoalDto.of(1, GoalUnit.TIMES)
-                , LocalTime.of(5,0)
-                , LocalDate.now()
-                ,null
-        );
-    }
-
-    public static RoutineGroupRequestDto createRoutineGroupRequestDtoForTest(){
-        return RoutineGroupRequestDto.of("test_member","테스트 그룹");
-    }
-
 
 }

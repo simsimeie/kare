@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.util.Objects;
 
 
 @Embeddable
@@ -28,14 +29,14 @@ public class Cycle {
     private boolean sun;
     private Integer count;
 
-    public Cycle(CycleType cycleType, Integer count){
+    private Cycle(CycleType cycleType, Integer count){
         if(null == count) throw new KBException("주당 일수 반복주기에는 주당 횟수 값이 들어와야 합니다.", ErrorCode.BAD_REQUEST);
 
         this.cycleType = cycleType;
         this.count = count;
     }
 
-    public Cycle(CycleType cycleType, boolean mon, boolean tue, boolean wed, boolean thu, boolean fri, boolean sat, boolean sun) {
+    private Cycle(CycleType cycleType, boolean mon, boolean tue, boolean wed, boolean thu, boolean fri, boolean sat, boolean sun) {
         if(!(mon || tue || wed || thu || fri || sat || sun)) throw new KBException("특정 요일 반복주기에는 수행할 요일이 1건 이상은 들어와야 합니다.", ErrorCode.BAD_REQUEST);
 
         this.cycleType = cycleType;
@@ -48,6 +49,21 @@ public class Cycle {
         this.sun = sun;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cycle cycle = (Cycle) o;
+        return mon == cycle.mon && tue == cycle.tue && wed == cycle.wed && thu == cycle.thu && fri == cycle.fri && sat == cycle.sat && sun == cycle.sun && cycleType == cycle.cycleType && Objects.equals(count, cycle.count);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cycleType, mon, tue, wed, thu, fri, sat, sun, count);
+    }
+
+
+    // ******** 생성 함수 ********
     public static Cycle createCycle(CycleDto cycleDto){
         checkValidCycleType(cycleDto);
 

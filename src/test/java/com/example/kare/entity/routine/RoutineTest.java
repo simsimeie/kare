@@ -32,7 +32,7 @@ public class RoutineTest {
     private RoutineGroup routineGroup02;
 
     @BeforeEach
-    public void given(){
+    public void init(){
         member = MemberRepositoryTest.createMemberForTest();
         memberRepository.save(member);
 

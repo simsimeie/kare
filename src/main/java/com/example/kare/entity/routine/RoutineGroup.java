@@ -27,6 +27,8 @@ public class RoutineGroup extends BaseTimeEntity {
     @OneToMany(mappedBy = "group")
     private List<LinkRoutineGroup> linkRoutineGroups = new ArrayList<>();
 
+
+
     // ******** 생성 함수 ********
     public static RoutineGroup createRoutineGroup(Member member, String name){
         RoutineGroup routineGroup = new RoutineGroup();

@@ -1,5 +1,7 @@
 package com.example.kare.repository;
 
+import com.example.kare.domain.today.dto.CycleDto;
+import com.example.kare.domain.today.dto.GoalDto;
 import com.example.kare.entity.routine.RoutineGroup;
 import com.example.kare.entity.routine.constant.CycleType;
 import com.example.kare.entity.routine.constant.GoalUnit;
@@ -153,6 +155,7 @@ public class RoutineRepositoryTest {
         displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
         routine = createRoutineForTest(member, displayLeastValue);
         routineRepoistory.save(routine);
+        assertEquals(0, displayLeastValue);
         displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
         routine = createRoutineForTest(member, displayLeastValue);
         routineRepoistory.save(routine);
@@ -194,8 +197,8 @@ public class RoutineRepositoryTest {
 
 
     public static Routine createRoutineForTest(Member member, Integer displayLeastValue) {
-        Cycle cycle = new Cycle(CycleType.DAY, true, true, true, true, true, true, false);
-        Goal goal = new Goal(1, GoalUnit.TIMES);
+        Cycle cycle = Cycle.createCycle(CycleDto.of(CycleType.DAY, true, true, true, true, true, true, false, null));
+        Goal goal = Goal.createGoal(GoalDto.of(1, GoalUnit.TIMES));
 
         return Routine.createRoutine(
                 "미라클모닝"

@@ -59,4 +59,34 @@ public class CycleTest {
         Exception exception = assertThrows(KBException.class , () -> cycleDto.toEntity());
     }
 
+    @Test
+    @DisplayName("동일한 사이클 값을 가진 Cycle 객체가 2개 주어질 때, 동등성 검사시 true로 나오는지 테스트")
+    public void cycleEqualityTest01(){
+        //given
+        CycleDto cycleDto = CycleDto.of(CycleType.DAY, true, true, true, true, true, true, true, null);
+        Cycle cycle1 = Cycle.createCycle(cycleDto);
+        Cycle cycle2 = Cycle.createCycle(cycleDto);
+
+        //when
+        boolean result = cycle1.equals(cycle2);
+        //then
+        assertEquals(true, result);
+    }
+
+    @Test
+    @DisplayName("서로 다른 사이클 값을 가진 Cycle 객체가 2개 주어질 때, 동등성 검사시 false로 나오는지 테스트")
+    public void cycleEqualityTest02(){
+        //given
+        CycleDto cycleDto1 = CycleDto.of(CycleType.DAY, true, true, true, true, true, true, true, null);
+        CycleDto cycleDto2 = CycleDto.of(CycleType.DAY, true, true, true, false, true, true, true, null);
+
+        Cycle cycle1 = Cycle.createCycle(cycleDto1);
+        Cycle cycle2 = Cycle.createCycle(cycleDto2);
+
+        //when
+        boolean result = cycle1.equals(cycle2);
+        //then
+        assertEquals(false, result);
+    }
+
 }
