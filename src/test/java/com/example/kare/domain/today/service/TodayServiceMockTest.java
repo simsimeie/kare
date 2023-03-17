@@ -34,9 +34,23 @@ public class TodayServiceMockTest {
     @Mock
     private MemberRepository memberRepository;
     @Mock
-    private RoutineRepoistory routineRepoistory;
+    private RoutineRepository routineRepository;
     @Mock
     private RoutineGroupRepository routineGroupRepository;
+
+    @Test
+    @DisplayName("루틴 조회 서비스 테스트")
+    public void retrieveRoutineTest01(){
+        LocalDate now = LocalDate.now();
+        todayService.retrieveRoutine("x", now);
+
+        LocalDate future = LocalDate.now().plusDays(1);
+        todayService.retrieveRoutine("x", future);
+        then(routineRepository).should(only()).findFutureRoutines(any(),any());
+
+        LocalDate past = LocalDate.now().minusDays(1);
+        todayService.retrieveRoutine("x", past);
+    }
 
     @Test
     @DisplayName("존재하지 않는 회원ID로 루틴을 만들 때 Exception 발생 여부 테스트")
@@ -57,7 +71,7 @@ public class TodayServiceMockTest {
         //given
         given(memberRepository.findById(any())).willReturn(Optional.of(MemberRepositoryTest.createMemberForTest()));
         RoutineRequestDto routineRequestDtoForTest = createRoutineRequestDtoForTest();
-        given(routineRepoistory.findRoutineDisplayLeastValue(any())).willReturn(1);
+        given(routineRepository.findRoutineDisplayLeastValue(any())).willReturn(1);
 
         //when
         Routine routine = todayService.transformRoutineRequestDtoToRoutine(routineRequestDtoForTest);
@@ -113,7 +127,7 @@ public class TodayServiceMockTest {
     @DisplayName("RoutineGroupRequestDto에 존재하지 않은 routineId가 들어왔을 때, KBException 발생하는지 테스트")
     public void routineIdIsInvalid_calllinkRoutineAndRoutineGroup_KBException_Test01(){
         //given
-        given(routineRepoistory.findById(any())).willReturn(Optional.empty());
+        given(routineRepository.findById(any())).willReturn(Optional.empty());
         LinkRoutineGroupRequestDto mock = mock(LinkRoutineGroupRequestDto.class);
         given(mock.getRoutineId()).willReturn(1L);
         //then
@@ -123,7 +137,7 @@ public class TodayServiceMockTest {
         });
 
         //then
-        then(routineRepoistory).should(never()).save(any());
+        then(routineRepository).should(never()).save(any());
     }
 
     @Test
@@ -131,7 +145,7 @@ public class TodayServiceMockTest {
     public void routineGroupIdIsInvalid_calllinkRoutineAndRoutineGroup_KBException_Test01(){
         //given
         Member member = MemberRepositoryTest.createMemberForTest();
-        given(routineRepoistory.findById(any())).willReturn(Optional.of(Mockito.mock(Routine.class)));
+        given(routineRepository.findById(any())).willReturn(Optional.of(Mockito.mock(Routine.class)));
         given(routineGroupRepository.findById(any())).willReturn(Optional.empty());
         LinkRoutineGroupRequestDto mock = mock(LinkRoutineGroupRequestDto.class);
         given(mock.getRoutineGroupId()).willReturn(1L);

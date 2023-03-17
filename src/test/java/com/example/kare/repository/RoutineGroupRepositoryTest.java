@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 
@@ -24,6 +25,8 @@ public class RoutineGroupRepositoryTest {
     private final RoutineGroupRepository routineGroupRepository;
     private final TestEntityManager em;
     private final MemberRepository memberRepository;
+    @MockBean
+    private RoutineRepositoryMyBatisImpl routineRepositoryMyBatis;
 
     public RoutineGroupRepositoryTest(
             @Autowired RoutineGroupRepository routineGroupRepository
@@ -49,7 +52,7 @@ public class RoutineGroupRepositoryTest {
 
 
     public static RoutineGroup createRoutineGroupForTest(Member member){
-        return RoutineGroup.createRoutineGroup(member,"테스트그룹");
+        return RoutineGroup.createRoutineGroup(member,"테스트그룹", 1);
     }
 
 

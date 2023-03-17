@@ -1,5 +1,7 @@
 package com.example.kare.entity.routine;
 
+import com.example.kare.common.constant.ErrorCode;
+import com.example.kare.common.exception.KBException;
 import com.example.kare.domain.today.dto.RoutineRequestDto;
 import com.example.kare.entity.BaseTimeEntity;
 import com.example.kare.entity.member.Member;
@@ -12,6 +14,7 @@ import javax.persistence.*;
 import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -88,6 +91,17 @@ public class Routine extends BaseTimeEntity {
     }
 
     public Routine modifyRoutine(RoutineRequestDto toBe){
+
+        if(Period.between(LocalDate.now(), toBe.getStartDate()).isNegative()
+                && !this.getStartDate().equals(toBe.getStartDate())){
+            throw new KBException("루틴의 시작 일자를 과거로 설정할 수 없습니다.", ErrorCode.BAD_REQUEST);
+        }
+
+        if(Period.between(LocalDate.now(), this.getStartDate()).isNegative()
+                && !this.getStartDate().equals(toBe.getStartDate())){
+            throw new KBException("이미 시작된 루틴의 시작일은 변경할 수 없습니다.", ErrorCode.BAD_REQUEST);
+        }
+
         Cycle toBeCycle = toBe.getCycle().toEntity();
         Goal toBeGoal = toBe.getGoal().toEntity();
 

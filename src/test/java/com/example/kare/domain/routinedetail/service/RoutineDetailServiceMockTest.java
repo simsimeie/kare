@@ -1,6 +1,6 @@
 package com.example.kare.domain.routinedetail.service;
 
-import com.example.kare.repository.RoutineRepoistory;
+import com.example.kare.repository.RoutineRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,17 +21,17 @@ public class RoutineDetailServiceMockTest {
     @InjectMocks
     private RoutineDetailService routineDetailService;
     @Mock
-    private RoutineRepoistory routineRepoistory;
+    private RoutineRepository routineRepository;
 
     @Test
     @DisplayName("주어진 memberId, routineId에 해당하는 routine이 없을 때 아무것도 삭제되지 않는지 테스트")
     public void routineDeleteTest01(){
         //given
-        given(routineRepoistory.findRoutineByIdAndMemberId(any(),any())).willReturn(Optional.empty());
+        given(routineRepository.findRoutineByIdAndMemberId(any(),any())).willReturn(Optional.empty());
         //when
         routineDetailService.deleteRoutine(any(),any());
         //then
-        then(routineRepoistory).should(never()).delete(any());
+        then(routineRepository).should(never()).delete(any());
     }
 
 

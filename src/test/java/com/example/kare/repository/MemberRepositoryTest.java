@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 
@@ -22,11 +23,12 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(locations = "classpath:application-test.yml")
-@Rollback(false)
 public class MemberRepositoryTest {
 
     private final MemberRepository memberRepository;
     private final TestEntityManager em;
+    @MockBean
+    private RoutineRepositoryMyBatisImpl routineRepositoryMyBatis;
 
     public MemberRepositoryTest(
             @Autowired MemberRepository memberRepository,

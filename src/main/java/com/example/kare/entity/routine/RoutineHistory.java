@@ -59,13 +59,16 @@ public class RoutineHistory extends BaseTimeEntity {
         return false;
     }
 
-    public void modifyRoutineHistory(Routine toBe){
+    public void modifyRoutineCharacter(Routine toBe){
         this.setCycle(toBe.getCycle());
         this.setGoal(toBe.getGoal());
-        this.setStartDate(toBe.getStartDate());
     }
 
-    public void changeRoutineHistoryEndDate(LocalDate endDate){
+    public void modifyRoutineStartDate(LocalDate startDate){
+        this.setStartDate(startDate);
+    }
+
+    public void modifyRoutineHistoryEndDate(LocalDate endDate){
         this.setEndDate(endDate);
     }
 }

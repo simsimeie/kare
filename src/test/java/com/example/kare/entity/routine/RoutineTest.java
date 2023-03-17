@@ -14,15 +14,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RoutineTest {
 
     private MemberRepository memberRepository;
-    private RoutineRepoistory routineRepoistory;
+    private RoutineRepository routineRepository;
     private RoutineGroupRepository routineGroupRepository;
 
     public RoutineTest(@Autowired MemberRepository memberRepository
-            ,@Autowired RoutineRepoistory routineRepoistory
+            ,@Autowired RoutineRepository routineRepository
             ,@Autowired RoutineGroupRepository routineGroupRepository
     ){
         this.memberRepository = memberRepository;
-        this.routineRepoistory = routineRepoistory;
+        this.routineRepository = routineRepository;
         this.routineGroupRepository = routineGroupRepository;
     }
 
@@ -37,7 +37,7 @@ public class RoutineTest {
         memberRepository.save(member);
 
         routine = RoutineRepositoryTest.createRoutineForTest(member, 1);
-        routineRepoistory.save(routine);
+        routineRepository.save(routine);
 
         routineGroup01 = RoutineGroupRepositoryTest.createRoutineGroupForTest(member);
         routineGroupRepository.save(routineGroup01);
@@ -49,7 +49,7 @@ public class RoutineTest {
     @DisplayName("루틴과 루틴그룹을 잘 연계하는지 테스트")
     public void addRoutineToRoutineGroupTest01(){
         routine.addRoutineToGroup(routineGroup01);
-        routineRepoistory.save(routine);
+        routineRepository.save(routine);
 
         assertEquals(routine.getLinkRoutineGroup().getGroup().getId() , routineGroup01.getId());
     }
@@ -58,7 +58,7 @@ public class RoutineTest {
     @DisplayName("루틴 그룹 클리어 테스트(orphanRemoval = true 테스트)")
     public void clearRoutineGroupTest01(){
         routine.clearRoutineGroup();
-        routineRepoistory.save(routine);
+        routineRepository.save(routine);
 
         assertNull(routine.getLinkRoutineGroup());
     }
@@ -67,13 +67,13 @@ public class RoutineTest {
     @DisplayName("루틴의 루틴그룹을 변경했을 때 잘 연계되는지 테스트")
     public void addRoutineToRoutineGroupTest02(){
         routine.addRoutineToGroup(routineGroup01);
-        routineRepoistory.save(routine);
+        routineRepository.save(routine);
 
         routine.clearRoutineGroup();
-        routineRepoistory.save(routine);
+        routineRepository.save(routine);
 
         routine.addRoutineToGroup(routineGroup02);
-        routineRepoistory.save(routine);
+        routineRepository.save(routine);
 
         assertEquals(routine.getLinkRoutineGroup().getGroup().getId() , routineGroup02.getId());
     }

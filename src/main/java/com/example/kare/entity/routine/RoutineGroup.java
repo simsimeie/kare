@@ -26,14 +26,16 @@ public class RoutineGroup extends BaseTimeEntity {
     private Member member;
     @OneToMany(mappedBy = "group")
     private List<LinkRoutineGroup> linkRoutineGroups = new ArrayList<>();
+    private Integer displayOrder;
 
 
 
     // ******** 생성 함수 ********
-    public static RoutineGroup createRoutineGroup(Member member, String name){
+    public static RoutineGroup createRoutineGroup(Member member, String name, Integer displayOrder){
         RoutineGroup routineGroup = new RoutineGroup();
         routineGroup.setMember(member);
         routineGroup.setName(name);
+        routineGroup.setDisplayOrder(displayOrder);
         return routineGroup;
     }
 

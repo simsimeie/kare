@@ -22,7 +22,7 @@ public class LinkRoutineGroup extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="routine_group_id")
     private RoutineGroup group;
-    private Integer displayOrder;
+    private Integer innerDisplayOrder;
 
 
     // ******** 생성 함수 ********
@@ -30,7 +30,7 @@ public class LinkRoutineGroup extends BaseTimeEntity {
         LinkRoutineGroup linkRoutineGroup = new LinkRoutineGroup();
         linkRoutineGroup.setRoutine(routine);
         linkRoutineGroup.setGroup(group);
-        linkRoutineGroup.setDisplayOrder(0);
+        linkRoutineGroup.setInnerDisplayOrder(0);
 
         return linkRoutineGroup;
     }

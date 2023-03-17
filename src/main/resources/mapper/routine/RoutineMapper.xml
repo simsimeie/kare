@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.kare.mapper.RoutineMapper">
+    <select id="findTodayRoutines" resultType="com.example.kare.domain.today.dto.RoutineResponseDto">
+        select a.routine_id
+             , a.name as routineName
+             , #{dayOfWeek} as dayOfWeek
+             , a.cycle_count
+             , a.cycle_type
+             , a.goal_value
+             , a.goal_unit
+             , a.display_order
+             , c.routine_group_id
+             , c.name as routineGroupName
+        from routine a left outer join link_routine_group b on a.link_routine_group_id = b.link_routine_group_id
+                       left outer join routine_group c on b.routine_group_id = c.routine_group_id
+        where 1=1
+          and a.member_id = #{memberId}
+          and #{searchDate} between a.start_date and NVL(a.end_date,'9999-12-31')
+        <if test="#{dayOfWeek} == 'MONDAY'">
+          and (a.cycle_type = 'DAY' or a.mon = true)
+        </if>
+        <if test="#{dayOfWeek} == 'TUESDAY'">
+          and (a.cycle_type = 'DAY' or a.tue = true)
+        </if>
+        <if test="#{dayOfWeek} == 'WEDNESDAY'">
+          and (a.cycle_type = 'DAY' or a.wed = true)
+        </if>
+        <if test="#{dayOfWeek} == 'THURSDAY'">
+          and (a.cycle_type = 'DAY' or a.thu = true)
+        </if>
+        <if test="#{dayOfWeek} == 'FRIDAY'">
+          and (a.cycle_type = 'DAY' or a.fri = true)
+        </if>
+        <if test="#{dayOfWeek} == 'SATURDAY'">
+          and (a.cycle_type = 'DAY' or a.sat = true)
+        </if>
+        <if test="#{dayOfWeek} == 'SUNDAY'">
+          and (a.cycle_type = 'DAY' or a.sun = true)
+        </if>
+    </select>
+</mapper>

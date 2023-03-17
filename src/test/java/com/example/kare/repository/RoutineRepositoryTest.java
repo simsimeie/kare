@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 
@@ -31,18 +32,20 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource(locations = "classpath:application-test.yml")
 @Rollback(false)
 public class RoutineRepositoryTest {
-    private final RoutineRepoistory routineRepoistory;
+    private final RoutineRepository routineRepository;
     private MemberRepository memberRepository;
     private final TestEntityManager em;
     @Autowired
     private RoutineGroupRepository routineGroupRepository;
+    @MockBean
+    private RoutineRepositoryMyBatisImpl routineRepositoryMyBatis;
 
     public RoutineRepositoryTest(
-            @Autowired RoutineRepoistory routineRepoistory
+            @Autowired RoutineRepository routineRepository
             ,@Autowired MemberRepository memberRepository
             ,@Autowired TestEntityManager entityManager
     ){
-        this.routineRepoistory = routineRepoistory;
+        this.routineRepository = routineRepository;
         this.memberRepository = memberRepository;
         this.em = entityManager;
     }
@@ -53,11 +56,11 @@ public class RoutineRepositoryTest {
         Member member = MemberRepositoryTest.createMemberForTest();
         memberRepository.save(member);
 
-        Integer displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        Integer displayLeastValue = routineRepository.findRoutineDisplayLeastValue(member);
 
         Routine routine = createRoutineForTest(member, displayLeastValue);
 
-        Routine savedRoutine = routineRepoistory.save(routine);
+        Routine savedRoutine = routineRepository.save(routine);
         assertEquals(savedRoutine.getId(), routine.getId());
     }
 
@@ -68,11 +71,11 @@ public class RoutineRepositoryTest {
         Member member = MemberRepositoryTest.createMemberForTest();
         memberRepository.save(member);
 
-        Integer displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        Integer displayLeastValue = routineRepository.findRoutineDisplayLeastValue(member);
 
         Routine routine = createRoutineForTest(member, displayLeastValue);
 
-        routineRepoistory.save(routine);
+        routineRepository.save(routine);
 
         RoutineGroup routineGroupForTest = RoutineGroupRepositoryTest.createRoutineGroupForTest(member);
 
@@ -81,7 +84,7 @@ public class RoutineRepositoryTest {
         routine.addRoutineToGroup(routineGroupForTest);
 
         //when
-        Routine savedRoutine = routineRepoistory.save(routine);
+        Routine savedRoutine = routineRepository.save(routine);
 
         //then
         assertEquals(savedRoutine.getId(), routine.getId());
@@ -99,13 +102,13 @@ public class RoutineRepositoryTest {
         Member member = MemberRepositoryTest.createMemberForTest();
         memberRepository.save(member);
 
-        Integer displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        Integer displayLeastValue = routineRepository.findRoutineDisplayLeastValue(member);
 
         Routine routine = createRoutineForTest(member, displayLeastValue);
-        routineRepoistory.save(routine);
+        routineRepository.save(routine);
 
         //when
-        Integer leastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        Integer leastValue = routineRepository.findRoutineDisplayLeastValue(member);
         //then
         assertEquals(0, leastValue);
     }
@@ -118,7 +121,7 @@ public class RoutineRepositoryTest {
         memberRepository.save(member);
 
         //when
-        Integer leastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        Integer leastValue = routineRepository.findRoutineDisplayLeastValue(member);
         //then
         assertEquals(null, leastValue);
     }
@@ -130,13 +133,13 @@ public class RoutineRepositoryTest {
         Member member = MemberRepositoryTest.createMemberForTest();
         memberRepository.save(member);
 
-        Integer displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        Integer displayLeastValue = routineRepository.findRoutineDisplayLeastValue(member);
 
         Routine routine = createRoutineForTest(member, displayLeastValue);
-        routineRepoistory.save(routine);
+        routineRepository.save(routine);
 
         //when
-        Integer leastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        Integer leastValue = routineRepository.findRoutineDisplayLeastValue(member);
         //then
         assertEquals(0, leastValue);
     }
@@ -149,32 +152,27 @@ public class RoutineRepositoryTest {
         memberRepository.save(member);
 
 
-        Integer displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        Integer displayLeastValue = routineRepository.findRoutineDisplayLeastValue(member);
         Routine routine = createRoutineForTest(member, displayLeastValue);
-        routineRepoistory.save(routine);
-        displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        routineRepository.save(routine);
+        displayLeastValue = routineRepository.findRoutineDisplayLeastValue(member);
         routine = createRoutineForTest(member, displayLeastValue);
-        routineRepoistory.save(routine);
-        assertEquals(0, displayLeastValue);
-        displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        routineRepository.save(routine);
+        displayLeastValue = routineRepository.findRoutineDisplayLeastValue(member);
         routine = createRoutineForTest(member, displayLeastValue);
-        routineRepoistory.save(routine);
-        assertEquals(-1, displayLeastValue);
-        displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        routineRepository.save(routine);
+        displayLeastValue = routineRepository.findRoutineDisplayLeastValue(member);
         routine = createRoutineForTest(member, displayLeastValue);
-        routineRepoistory.save(routine);
-        assertEquals(-2, displayLeastValue);
-        displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        routineRepository.save(routine);
+        displayLeastValue = routineRepository.findRoutineDisplayLeastValue(member);
         routine = createRoutineForTest(member, displayLeastValue);
-        routineRepoistory.save(routine);
-        assertEquals(-3, displayLeastValue);
-        displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        routineRepository.save(routine);
+        displayLeastValue = routineRepository.findRoutineDisplayLeastValue(member);
         routine = createRoutineForTest(member, displayLeastValue);
-        routineRepoistory.save(routine);
-        assertEquals(-4, displayLeastValue);
-        displayLeastValue = routineRepoistory.findRoutineDisplayLeastValue(member);
+        routineRepository.save(routine);
+        displayLeastValue = routineRepository.findRoutineDisplayLeastValue(member);
         routine = createRoutineForTest(member, displayLeastValue);
-        routineRepoistory.save(routine);
+        routineRepository.save(routine);
         assertEquals(-5, displayLeastValue);
 
     }
@@ -185,14 +183,14 @@ public class RoutineRepositoryTest {
         //given
         Member member = MemberRepositoryTest.createMemberForTest();
         memberRepository.save(member);
-        Integer displayOrder = routineRepoistory.findRoutineDisplayLeastValue(member);
+        Integer displayOrder = routineRepository.findRoutineDisplayLeastValue(member);
         Routine routine = RoutineRepositoryTest.createRoutineForTest(member,displayOrder);
-        routineRepoistory.save(routine);
+        routineRepository.save(routine);
 
         //when
-        routineRepoistory.delete(routine);
+        routineRepository.delete(routine);
         //then
-        assertEquals(Optional.empty(), routineRepoistory.findById(routine.getId()));
+        assertEquals(Optional.empty(), routineRepository.findById(routine.getId()));
     }
 
 

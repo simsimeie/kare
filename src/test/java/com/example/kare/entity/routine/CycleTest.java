@@ -38,7 +38,7 @@ public class CycleTest {
         Cycle cycle = cycleDto.toEntity();
         //then
         assertEquals(CycleType.TIMES, cycle.getCycleType());
-        assertEquals(3, cycle.getCount());
+        assertEquals(3, cycle.getCycleCount());
     }
 
     @Test

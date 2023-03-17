@@ -5,21 +5,21 @@ import com.example.kare.domain.today.dto.CycleDto;
 import com.example.kare.domain.today.dto.GoalDto;
 import com.example.kare.domain.today.dto.RoutineRequestDto;
 import com.example.kare.entity.member.Member;
-import com.example.kare.entity.routine.Routine;
-import com.example.kare.entity.routine.RoutineHistory;
+import com.example.kare.entity.routine.*;
 import com.example.kare.entity.routine.constant.CycleType;
 import com.example.kare.entity.routine.constant.GoalUnit;
 import com.example.kare.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -29,26 +29,34 @@ public class TodayServiceTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
-    private RoutineRepoistory routineRepoistory;
+    private RoutineRepository routineRepository;
     @Autowired
     private TodayService todayService;
+    @Autowired
+    private RoutineHistoryRepository routineHistoryRepository;
     private Member member;
     private Routine routine;
     private RoutineRequestDto mockRoutineRequestDto;
+    private RoutineGroup routineGroup;
     @Autowired
-    private RoutineHistoryRepository routineHistoryRepository;
+    private RoutineGroupRepository routineGroupRepository;
+
 
     @BeforeEach
     public void init(){
         member = MemberRepositoryTest.createMemberForTest();
         memberRepository.save(member);
 
-        CycleDto cycleDto = CycleDto.of(CycleType.DAY, true, true, true, true, true, true, false, null);
-        GoalDto goalDto = GoalDto.of(1, GoalUnit.TIMES);
+        routineGroup = RoutineGroupRepositoryTest.createRoutineGroupForTest(member);
+        routineGroupRepository.save(routineGroup);
 
         routine = RoutineRepositoryTest.createRoutineForTest(member, 1);
-        routineRepoistory.save(routine);
+        routine.addRoutineToGroup(routineGroup);
+        routineRepository.save(routine);
+
         mockRoutineRequestDto = Mockito.mock(RoutineRequestDto.class);
+        CycleDto cycleDto = CycleDto.of(CycleType.DAY, true, true, true, true, true, true, false, null);
+        GoalDto goalDto = GoalDto.of(1, GoalUnit.TIMES);
         given(mockRoutineRequestDto.getRoutineId()).willReturn(routine.getId());
         given(mockRoutineRequestDto.getName()).willReturn(routine.getName());
         given(mockRoutineRequestDto.getGoal()).willReturn(goalDto);
@@ -95,8 +103,77 @@ public class TodayServiceTest {
     @Test
     @DisplayName("과거날짜로 startDate를 변경했을 때, KB Exception 발생하는지 테스트")
     public void modifyRoutineTest03(){
+        //given
         given(mockRoutineRequestDto.getStartDate()).willReturn(LocalDate.now().minusDays(1));
+        //then
         assertThrows(KBException.class, ()->todayService.modifyRoutine(mockRoutineRequestDto));
+    }
+
+    @Test
+    @DisplayName("이미 시작된 루틴의 startDate를 변경했을 때, KB Exception 발생하는지 테스트")
+    public void modifyRoutineTest04(){
+        //given
+        CycleDto cycleDto = CycleDto.of(CycleType.DAY, true, true, true, true, true, true, false, null);
+        GoalDto goalDto = GoalDto.of(1, GoalUnit.TIMES);
+
+        Routine proceedingRoutine = Routine.createRoutine(
+                "미라클점심"
+                , member
+                , true
+                , cycleDto.toEntity()
+                , goalDto.toEntity()
+                , LocalTime.of(12, 00, 00)
+                , LocalDate.now().minusDays(10)
+                , null
+                , 1
+        );
+
+        routineRepository.save(proceedingRoutine);
+
+        given(mockRoutineRequestDto.getStartDate()).willReturn(LocalDate.now().plusDays(1));
+        given(mockRoutineRequestDto.getRoutineId()).willReturn(proceedingRoutine.getId());
+
+
+        assertThrows(KBException.class, ()->todayService.modifyRoutine(mockRoutineRequestDto));
+    }
+
+    @Test
+    @DisplayName("루틴 조회 서비스 테스트")
+    public void retrieveRoutineTest01(){
+        Cycle cycle1 = CycleDto.of(CycleType.DAY, true, true, true, true, true, true, false, null).toEntity();
+        Cycle cycle2 = CycleDto.of(CycleType.TIMES, false, false, false, false, false, false, false, 3).toEntity();
+        Goal goal = GoalDto.of(1000, GoalUnit.TIMES).toEntity();
+
+        Routine routine1 = Routine.createRoutine(
+                "미라클모닝"
+                , member
+                , true
+                , cycle1
+                , goal
+                , LocalTime.of(5, 0, 0)
+                , LocalDate.of(2023, Month.MARCH, 17)
+                , null
+                , 1
+        );
+
+
+        Routine routine2 = Routine.createRoutine(
+                "미라클점심"
+                , member
+                , true
+                , cycle2
+                , goal
+                , LocalTime.of(12, 0, 0)
+                , LocalDate.of(2023, Month.MARCH, 17)
+                , null
+                , 1
+        );
+        routine2.addRoutineToGroup(routineGroup);
+        routineRepository.save(routine1);
+        routineRepository.save(routine2);
+
+        todayService.retrieveRoutine(member.getId(), LocalDate.now().plusDays(1));
+
     }
 
 }

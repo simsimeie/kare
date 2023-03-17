@@ -24,7 +24,7 @@ public class CycleDto {
     private boolean sun;
     @Max(value = 7, message = "주별 회수의 최대 값은 7 입니다.")
     @Min(value = 1, message = "주별 회수의 최소 값은 1 입니다.")
-    private Integer count;
+    private Integer cycleCount;
 
     public CycleDto(CycleType cycleType, boolean mon, boolean tue, boolean wed, boolean thu, boolean fri, boolean sat, boolean sun) {
         this.cycleType = cycleType;
@@ -37,9 +37,9 @@ public class CycleDto {
         this.sun = sun;
     }
 
-    public CycleDto(CycleType cycleType, Integer count) {
+    public CycleDto(CycleType cycleType, Integer cycleCount) {
         this.cycleType = cycleType;
-        this.count = count;
+        this.cycleCount = cycleCount;
     }
 
     public Cycle toEntity(){

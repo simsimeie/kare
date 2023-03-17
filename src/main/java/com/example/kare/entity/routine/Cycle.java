@@ -27,13 +27,13 @@ public class Cycle {
     private boolean fri;
     private boolean sat;
     private boolean sun;
-    private Integer count;
+    private Integer cycleCount;
 
-    private Cycle(CycleType cycleType, Integer count){
-        if(null == count) throw new KBException("주당 일수 반복주기에는 주당 횟수 값이 들어와야 합니다.", ErrorCode.BAD_REQUEST);
+    private Cycle(CycleType cycleType, Integer cycleCount){
+        if(null == cycleCount) throw new KBException("주당 일수 반복주기에는 주당 횟수 값이 들어와야 합니다.", ErrorCode.BAD_REQUEST);
 
         this.cycleType = cycleType;
-        this.count = count;
+        this.cycleCount = cycleCount;
     }
 
     private Cycle(CycleType cycleType, boolean mon, boolean tue, boolean wed, boolean thu, boolean fri, boolean sat, boolean sun) {
@@ -54,12 +54,12 @@ public class Cycle {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Cycle cycle = (Cycle) o;
-        return mon == cycle.mon && tue == cycle.tue && wed == cycle.wed && thu == cycle.thu && fri == cycle.fri && sat == cycle.sat && sun == cycle.sun && cycleType == cycle.cycleType && Objects.equals(count, cycle.count);
+        return mon == cycle.mon && tue == cycle.tue && wed == cycle.wed && thu == cycle.thu && fri == cycle.fri && sat == cycle.sat && sun == cycle.sun && cycleType == cycle.cycleType && Objects.equals(cycleCount, cycle.cycleCount);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(cycleType, mon, tue, wed, thu, fri, sat, sun, count);
+        return Objects.hash(cycleType, mon, tue, wed, thu, fri, sat, sun, cycleCount);
     }
 
 
@@ -81,7 +81,7 @@ public class Cycle {
         } else if (cycleDto.getCycleType() == CycleType.TIMES) {
             return new Cycle(
                     cycleDto.getCycleType()
-                    , cycleDto.getCount()
+                    , cycleDto.getCycleCount()
             );
         } else {
             throw new KBException( cycleDto.getCycleType() + " 주기에 대한 정책이 없습니다.", ErrorCode.BAD_REQUEST);

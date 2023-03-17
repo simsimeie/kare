@@ -105,7 +105,7 @@ class TodayControllerTest {
     public void createRoutineValidationTest03() throws Exception {
         RoutineRequestDto routineRequestDtoForTest
                 = TodayServiceMockTest.createRoutineRequestDtoForTest();
-        routineRequestDtoForTest.getCycle().setCount(0);
+        routineRequestDtoForTest.getCycle().setCycleCount(0);
         // when
         mvc.perform(
                         post("/today/routine")
@@ -121,7 +121,7 @@ class TodayControllerTest {
     public void createRoutineValidationTest04() throws Exception {
         RoutineRequestDto routineRequestDtoForTest
                 = TodayServiceMockTest.createRoutineRequestDtoForTest();
-        routineRequestDtoForTest.getCycle().setCount(8);
+        routineRequestDtoForTest.getCycle().setCycleCount(8);
         // when
         mvc.perform(
                         post("/today/routine")

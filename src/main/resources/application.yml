@@ -18,3 +18,14 @@ logging.level:
   org.hibernate.SQL: debug
 # org.hibernate.type: trace #??? ?? 2.x, hibernate5
 # org.hibernate.orm.jdbc.bind: trace #??? ?? 3.x, hibernate6
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+#    lazy-loading-enabled: false
+#    aggressive-lazy-loading: false
+#    use-column-label: true
+#    jdbc-type-for-null: 'NULL'
+#    multiple-result-sets-enabled: true
+#    call-setters-on-nulls: true
