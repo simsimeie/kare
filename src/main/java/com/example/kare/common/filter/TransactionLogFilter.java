@@ -20,7 +20,7 @@ import java.util.UUID;
 
 
 @Slf4j
-@WebFilter(urlPatterns = {"/signup/*", "/today/*"})
+@WebFilter(urlPatterns = {"/signup/*", "/v1/*"})
 @RequiredArgsConstructor
 public class TransactionLogFilter implements Filter {
     private final JdbcTemplate jdbcTemplate;

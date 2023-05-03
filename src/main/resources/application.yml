@@ -29,3 +29,6 @@ mybatis:
 #    jdbc-type-for-null: 'NULL'
 #    multiple-result-sets-enabled: true
 #    call-setters-on-nulls: true
+
+
+active.routine.limit : 100

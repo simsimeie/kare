@@ -5,6 +5,7 @@ import com.example.kare.common.exception.KBException;
 import com.example.kare.domain.today.dto.CycleDto;
 import com.example.kare.entity.routine.constant.CycleType;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,6 +18,7 @@ import java.util.Objects;
 @Embeddable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode
 public class Cycle {
     @Enumerated(EnumType.STRING)
     private CycleType cycleType;
@@ -48,20 +50,6 @@ public class Cycle {
         this.sat = sat;
         this.sun = sun;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Cycle cycle = (Cycle) o;
-        return mon == cycle.mon && tue == cycle.tue && wed == cycle.wed && thu == cycle.thu && fri == cycle.fri && sat == cycle.sat && sun == cycle.sun && cycleType == cycle.cycleType && Objects.equals(cycleCount, cycle.cycleCount);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(cycleType, mon, tue, wed, thu, fri, sat, sun, cycleCount);
-    }
-
 
     // ******** 생성 함수 ********
     public static Cycle createCycle(CycleDto cycleDto){

@@ -17,7 +17,7 @@ import javax.validation.constraints.Positive;
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
 public class GoalDto {
-
+    private Integer goalType;
     @Max(value = 9999999, message = "최대 7자리 정수까지만 가능합니다.")
     @Positive(message = "목표 값은 0보다 큰 양수로 입력하셔야 합니다.")
     private Integer goalValue;

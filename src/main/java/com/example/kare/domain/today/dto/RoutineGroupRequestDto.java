@@ -20,11 +20,12 @@ public class RoutineGroupRequestDto {
     @NotBlank
     private String name;
 
-    public RoutineGroup toEntity(Member member, String name, Integer displayOrder){
+    public RoutineGroup toEntity(Member member, Integer routnGrpSeq, Integer soOdr) {
         return RoutineGroup.createRoutineGroup(
                 member
-                , name
-                , displayOrder
+                , this.name
+                , routnGrpSeq
+                , soOdr
         );
     }
 }

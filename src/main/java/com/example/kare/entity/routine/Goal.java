@@ -4,10 +4,7 @@ import com.example.kare.common.constant.ErrorCode;
 import com.example.kare.common.exception.KBException;
 import com.example.kare.domain.today.dto.GoalDto;
 import com.example.kare.entity.routine.constant.GoalUnit;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
@@ -18,10 +15,12 @@ import java.util.Objects;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode
 public class Goal {
     private Integer goalValue;
     @Enumerated(EnumType.STRING)
     private GoalUnit goalUnit;
+    private Integer goalType;
 
     private Goal(Integer goalValue, GoalUnit goalUnit) {
         this.goalValue = goalValue;
@@ -33,24 +32,12 @@ public class Goal {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Goal goal = (Goal) o;
-        return Objects.equals(goalValue, goal.goalValue) && goalUnit == goal.goalUnit;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(goalValue, goalUnit);
-    }
-
     // ******** 생성 함수 ********
     public static Goal createGoal(GoalDto goalDto){
         checkValidGoalUnit(goalDto);
 
         Goal goal = new Goal();
+        goal.setGoalType(goalDto.getGoalType());
         goal.setGoalValue(goalDto.getGoalValue());
         goal.setGoalUnit(goalDto.getGoalUnit());
 
@@ -62,7 +49,7 @@ public class Goal {
             this.goalUnit = goalUnit;
         }
          */
-        return new Goal(goalDto.getGoalValue(), goalDto.getGoalUnit());
+        return goal;
     }
 
     private static void checkValidGoalUnit(GoalDto goalDto) {

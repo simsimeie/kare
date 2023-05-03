@@ -17,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
     @Id
-    @Column(name = "member_id")
+    @Column(name = "MMR_ID")
     private String id;
     private String ci;
     private String name;

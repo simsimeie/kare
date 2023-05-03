@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.Valid;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
@@ -22,21 +23,35 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class RoutineRequestDto {
     @Positive
-    private Long routineId;
+    private Integer routineSequence;
     @NotBlank
-    private String name;
+    private String routineName;
     @NotEmpty
     private String memberId;
+    private Integer routineGroupSequence;
+    private String routineGroupName;
     private boolean alarm;
     private @Valid CycleDto cycle;
     private @Valid GoalDto goal;
     private LocalTime alarmTime;
+    @FutureOrPresent
     private LocalDate startDate;
+    @FutureOrPresent
     private LocalDate endDate;
 
-    public RoutineRequestDto(String name, String memberId, boolean alarm, CycleDto cycle, GoalDto goal, LocalTime alarmTime, LocalDate startDate, LocalDate endDate) {
-        this.name = name;
+    public RoutineRequestDto(
+            String routineName,
+            String memberId,
+            Integer routineGroupSequence,
+            boolean alarm,
+            CycleDto cycle,
+            GoalDto goal,
+            LocalTime alarmTime,
+            LocalDate startDate,
+            LocalDate endDate) {
+        this.routineName = routineName;
         this.memberId = memberId;
+        this.routineGroupSequence = routineGroupSequence;
         this.alarm = alarm;
         this.cycle = cycle;
         this.goal = goal;
@@ -45,13 +60,14 @@ public class RoutineRequestDto {
         this.endDate = endDate;
     }
 
-    public Routine toEntity(Member member, Integer displayOrder){
+    public Routine toEntity(Member member, Integer routnSeq, Integer sortOrder) {
 
         Cycle cycle = this.getCycle().toEntity();
         Goal goal = this.getGoal().toEntity();
 
         return Routine.createRoutine(
-                this.getName()
+                this.getRoutineName()
+                , routnSeq
                 , member
                 , this.isAlarm()
                 , cycle
@@ -59,7 +75,7 @@ public class RoutineRequestDto {
                 , this.getAlarmTime()
                 , this.getStartDate()
                 , this.getEndDate()
-                , displayOrder
+                , sortOrder
         );
     }
 

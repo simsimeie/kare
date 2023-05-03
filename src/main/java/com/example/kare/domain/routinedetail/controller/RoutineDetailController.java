@@ -12,8 +12,8 @@ public class RoutineDetailController {
     private final RoutineDetailService routineDetailService;
 
     @DeleteMapping("/routine-detail/routine")
-    public ResponseDto<Void> deleteRoutine(Long routineId, String memberId ){
-        routineDetailService.deleteRoutine(routineId, memberId);
+    public ResponseDto<Void> deleteRoutine(Integer routnSeq, String memberId ){
+        routineDetailService.deleteRoutine(routnSeq, memberId);
         return ResponseDto.of(null);
     }
 }
