@@ -26,16 +26,18 @@ public class RoutineGroupService {
 
 
     @Transactional
-    public RoutineGroupId createRoutineGroup(String mmrId, String routnGrpNm){
+    public RoutineGroupId inputRoutineGroup(
+            String mmrId,
+            String routnGrpNm) {
         Member member = memberService.findMember(mmrId);
-        Integer routineGroupSequence = routineGroupRepo.findMaxRoutineGroupSequence(member);
-        Integer minSortOrder = commonService.findMinSortOrder(member);
+        Integer routineGroupSequence = routineGroupRepo.findMaxRoutnGrpSeq(member);
+        Integer sortOrder = commonService.findMinSoOrd(member);
 
         RoutineGroup routineGroup = RoutineGroup.createRoutineGroup(
                 member,
                 routnGrpNm,
                 routineGroupSequence,
-                minSortOrder
+                sortOrder
         );
 
         routineGroupRepo.save(routineGroup);
@@ -44,26 +46,26 @@ public class RoutineGroupService {
     }
 
     @Transactional
-    public RoutineGroupId createRoutineGroup(RoutineGroupRequestDto routineGroupRequestDto) {
-        RoutineGroup routineGroup = transformRoutineGroupRequestDtoToRoutineGroup(routineGroupRequestDto);
+    public RoutineGroupId inputRoutineGroup(RoutineGroupRequestDto routineGroupRequestDto) {
+        RoutineGroup routineGroup = createRoutineGroup(routineGroupRequestDto);
         routineGroupRepo.save(routineGroup);
 
         return routineGroup.getId();
     }
 
-    protected RoutineGroup transformRoutineGroupRequestDtoToRoutineGroup(RoutineGroupRequestDto routineGroupRequestDto) {
+    private RoutineGroup createRoutineGroup(RoutineGroupRequestDto routineGroupRequestDto) {
         Member member = memberService.findMember(routineGroupRequestDto.getMemberId());
-        Integer routineGroupSequence = routineGroupRepo.findMaxRoutineGroupSequence(member);
-        Integer minSortOrder = commonService.findMinSortOrder(member);
+        Integer routineGroupSequence = routineGroupRepo.findMaxRoutnGrpSeq(member);
+        Integer sortOrder = commonService.findMinSoOrd(member);
 
         return routineGroupRequestDto.toEntity(
                 member,
                 routineGroupSequence,
-                minSortOrder
+                sortOrder
         );
     }
 
-    public RoutineGroup findtRoutineGroup(Integer routnGrpSeq, String memberId) {
+    public RoutineGroup findRoutineGroup(Integer routnGrpSeq, String memberId) {
         Optional<RoutineGroup> routineGroup = routineGroupRepo.findById(new RoutineGroupId(routnGrpSeq, memberId));
         if (routineGroup.isEmpty()) {
             throw new KBException("존재하지 않는 루틴 그룹입니다.", ErrorCode.BAD_REQUEST);

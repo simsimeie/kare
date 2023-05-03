@@ -20,6 +20,6 @@ public class RoutineGroupController {
     private final RoutineGroupService routineGroupService;
     @PostMapping("/create")
     public ResponseDto<RoutineGroupId> createRoutineGroup(@RequestBody @Valid RoutineGroupRequestDto requestDto){
-        return ResponseDto.of(routineGroupService.createRoutineGroup(requestDto));
+        return ResponseDto.of(routineGroupService.inputRoutineGroup(requestDto));
     }
 }

@@ -11,5 +11,5 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class CreateRoutineRequestDto {
-    private @Valid List<RoutineRequestDto> routines;
+    private @Valid List<RoutineRequestDto> routineList;
 }

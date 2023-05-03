@@ -31,11 +31,58 @@ public class RoutineService {
     private final CommonService commonService;
     private final RoutineRepo routineRepo;
     private final RoutineDetailRepo routineDetailRepo;
-    private final EntityManager em;
-
+    private final EntityManager entityManager;
     @Value("${active.routine.limit}")
     private Integer limit;
 
+
+    @Transactional
+    public Integer inputRoutine(CreateRoutineRequestDto reqDto) {
+        // TODO : reqDto.getRoutines().get(0) 부분 memberId AccessToken으로 받을 경우 로직 변경
+        String mmrId = reqDto.getRoutineList().get(0).getMemberId();
+
+        validationCheck(mmrId, reqDto.getRoutineList().size());
+
+        for (RoutineRequestDto routineDto : reqDto.getRoutineList()) {
+            Routine routine = createRoutine(routineDto);
+            routineRepo.save(routine);
+            entityManager.flush();
+
+            if (routineDto.getRoutineGroupSequence() != null) {
+                RoutineGroup routineGroup = routineGroupService.findRoutineGroup(routineDto.getRoutineGroupSequence(), routine.getMember().getId());
+                routine.mapToRoutineGroup(routineGroup);
+            } else if (routineDto.getRoutineGroupName() != null) {
+                RoutineGroupId routineGroupId = routineGroupService.inputRoutineGroup(mmrId, routineDto.getRoutineGroupName());
+                routine.mapToRoutineGroup(routineGroupId);
+            }
+            entityManager.flush();
+        }
+
+        return reqDto.getRoutineList().size();
+    }
+
+    protected void validationCheck(String mmrId, Integer routineSizeToAdd) {
+        Integer activeRoutineNum = routineRepo.findActiveRoutineNum(mmrId);
+        if (limit < activeRoutineNum + routineSizeToAdd) {
+            throw new KBException(limit + "개 이하의 루틴만 등록 가능합니다.", ErrorCode.BAD_REQUEST);
+        }
+    }
+
+    private Routine createRoutine(RoutineRequestDto routineDto) {
+        Member member = memberService.findMember(routineDto.getMemberId());
+        Integer routineSeq = routineRepo.findMaxRoutnSeq(member);
+        Integer sortOrder = commonService.findMinSoOrd(member);
+
+        return createRoutine(routineDto, member, routineSeq, sortOrder);
+    }
+
+    private Routine createRoutine(RoutineRequestDto routineDto,
+                                  Member member,
+                                  Integer routineSequence,
+                                  Integer sortOrder) {
+
+        return routineDto.toEntity(member, routineSequence, sortOrder);
+    }
 
     public Map<String, Object> retrieveRoutine(String memberId, LocalDate searchDate) {
         List<RoutineResponseDto> routines = new ArrayList<>();
@@ -79,51 +126,14 @@ public class RoutineService {
     }
 
     @Transactional
-    public Integer createRoutine(CreateRoutineRequestDto reqDto) {
-        // TODO : reqDto.getRoutines().get(0) 부분 memberId AccessToken으로 받을 경우 로직 변경
-        String mmrId = reqDto.getRoutines().get(0).getMemberId();
-
-        validationCheck(mmrId, reqDto.getRoutines().size());
-
-        for(RoutineRequestDto routineDto : reqDto.getRoutines()) {
-            Routine routine = transformRoutineRequestDtoToRoutine(routineDto);
-            routineRepo.save(routine);
-            em.flush();
-
-            if(routineDto.getRoutineGroupSequence() != null) {
-                RoutineGroup routineGroup = routineGroupService.findtRoutineGroup(routineDto.getRoutineGroupSequence(), routine.getMember().getId());
-                routine.mapToRoutineGroup(routineGroup);
-            } else if( routineDto.getRoutineGroupName() != null){
-                RoutineGroupId routineGroupId = routineGroupService.createRoutineGroup(mmrId, routineDto.getRoutineGroupName());
-                routine.mapToRoutineGroup(routineGroupId);
-            }
-        }
-
-        return reqDto.getRoutines().size();
-    }
-
-    public void validationCheck(String mmrId, Integer routineSizeToAdd){
-        Integer activeRoutineNum = routineRepo.findActiveRoutineNum(mmrId);
-        if(limit < activeRoutineNum + routineSizeToAdd) {
-            throw new KBException(limit+"개 이하의 루틴만 등록 가능합니다.", ErrorCode.BAD_REQUEST);
-        }
-
-    }
-
-    protected Routine transformRoutineRequestDtoToRoutine(RoutineRequestDto routineDto) {
-        Member member = memberService.findMember(routineDto.getMemberId());
-        Integer routineId = routineRepo.findMaxRoutineId(member);
-
-        Integer sortOrder = commonService.findMinSortOrder(member);
-        return routineDto.toEntity(member, routineId, sortOrder);
-    }
-
-    @Transactional
     public RoutineId modifyRoutine(RoutineRequestDto routineRequestDto) {
-        Routine routine = getRoutine(routineRequestDto.getRoutineSequence(), routineRequestDto.getMemberId());
+        Routine routine = findRoutine(
+                routineRequestDto.getRoutineSequence(),
+                routineRequestDto.getMemberId()
+        );
         routine.modifyRoutine(routineRequestDto);
 
-        RoutineDetail routineDetail = getActiveRoutineDetail(routine);
+        RoutineDetail routineDetail = findActiveRoutineDetail(routine);
 
         if (routineDetail.isShouldUpdateRoutineHistory(routine)) {
             // start date가 변경된 경우에는 현재 < 변경할 start date && Last History start date 경우만 고려하면 된다.
@@ -154,23 +164,21 @@ public class RoutineService {
         return routine.getId();
     }
 
-    private RoutineDetail getActiveRoutineDetail(Routine routine) {
-        RoutineDetail active = routineDetailRepo.findLastRoutineHistory(
+    private RoutineDetail findActiveRoutineDetail(Routine routine) {
+        RoutineDetail active = routineDetailRepo.findActiveRoutineDetail(
                 routine.getRoutnSeq(),
                 routine.getMember().getId()
         );
         return active;
     }
 
-    private Routine getRoutine(Integer routnId, String memberId) {
+    private Routine findRoutine(Integer routnId, String memberId) {
         Optional<Routine> routine = routineRepo.findById(new RoutineId(routnId, memberId));
         if (routine.isEmpty()) {
             throw new KBException("존재하지 않는 루틴입니다.", ErrorCode.BAD_REQUEST);
         }
         return routine.get();
     }
-
-
 
 
 }

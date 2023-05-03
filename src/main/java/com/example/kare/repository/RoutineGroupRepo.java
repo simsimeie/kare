@@ -9,8 +9,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface RoutineGroupRepo extends JpaRepository<RoutineGroup, RoutineGroupId> {
     @Query("select coalesce(max(rg.routnGrpSeq),0) + 1 from RoutineGroup rg where rg.member = :member")
-    Integer findMaxRoutineGroupSequence(@Param("member") Member member);
+    Integer findMaxRoutnGrpSeq(@Param("member") Member member);
 
     @Query("select coalesce(min(r.soOdr),100) - 1 from RoutineGroup r where r.member = :member")
-    Integer findMinSortOrder(@Param("member") Member member);
+    Integer findMinSoOrd(@Param("member") Member member);
 }

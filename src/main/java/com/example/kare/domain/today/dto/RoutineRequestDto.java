@@ -31,9 +31,9 @@ public class RoutineRequestDto {
     private Integer routineGroupSequence;
     private String routineGroupName;
     private boolean alarm;
+    private LocalTime alarmTime;
     private @Valid CycleDto cycle;
     private @Valid GoalDto goal;
-    private LocalTime alarmTime;
     @FutureOrPresent
     private LocalDate startDate;
     @FutureOrPresent
@@ -60,14 +60,14 @@ public class RoutineRequestDto {
         this.endDate = endDate;
     }
 
-    public Routine toEntity(Member member, Integer routnSeq, Integer sortOrder) {
+    public Routine toEntity(Member member, Integer routineSequence, Integer sortOrder) {
 
         Cycle cycle = this.getCycle().toEntity();
         Goal goal = this.getGoal().toEntity();
 
         return Routine.createRoutine(
                 this.getRoutineName()
-                , routnSeq
+                , routineSequence
                 , member
                 , this.isAlarm()
                 , cycle

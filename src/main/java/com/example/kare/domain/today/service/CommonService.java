@@ -18,16 +18,16 @@ public class CommonService {
     private final RoutineGroupRepo routineGroupRepo;
     private final RoutineRepo routineRepo;
 
-    public Integer findMinSortOrder(Member member) {
-        Integer routineSortOrderMinValue = routineRepo.findMinSortOrder(member);
-        Integer routineGroupSortOrderMinValue = routineGroupRepo.findMinSortOrder(member);
+    public Integer findMinSoOrd(Member member) {
+        Integer routineSortOrderMinValue = routineRepo.findMinSoOrd(member);
+        Integer routineGroupSortOrderMinValue = routineGroupRepo.findMinSoOrd(member);
 
         log.debug("routineSortOrderMinValue : {} , routineGroupSortOrderMinValue : {} ", routineSortOrderMinValue, routineGroupSortOrderMinValue);
 
-        Integer minSortOrder = routineSortOrderMinValue > routineGroupSortOrderMinValue ? routineGroupSortOrderMinValue : routineSortOrderMinValue;
+        Integer minSoOrd = routineSortOrderMinValue > routineGroupSortOrderMinValue ? routineGroupSortOrderMinValue : routineSortOrderMinValue;
 
-        log.debug("minSortOrder : {} ", minSortOrder);
+        log.debug("minSortOrder : {} ", minSoOrd);
 
-        return minSortOrder;
+        return minSoOrd;
     }
 }

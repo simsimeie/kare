@@ -17,5 +17,5 @@ public interface RoutineDetailRepo extends JpaRepository<RoutineDetail, RoutineD
                                         "where rdm2.routnSeq = :routnSeq " +
                                         "and rdm2.mmrId = :mmrId)"
     )
-    RoutineDetail findLastRoutineHistory(@Param("routnSeq")Integer routnSeq, @Param("mmrId")String mmrId);
+    RoutineDetail findActiveRoutineDetail(@Param("routnSeq")Integer routnSeq, @Param("mmrId")String mmrId);
 }

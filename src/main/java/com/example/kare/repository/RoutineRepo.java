@@ -9,8 +9,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface RoutineRepo extends JpaRepository<Routine, RoutineId>, RoutineRepoCustom {
     @Query("select coalesce(max(r.routnSeq),0) + 1 from Routine r where r.member = :member")
-    Integer findMaxRoutineId(@Param("member") Member member);
+    Integer findMaxRoutnSeq(@Param("member") Member member);
 
     @Query("select coalesce(min(r.soOrd),100) - 1 from Routine r where r.member = :member")
-    Integer findMinSortOrder(@Param("member") Member member);
+    Integer findMinSoOrd(@Param("member") Member member);
 }

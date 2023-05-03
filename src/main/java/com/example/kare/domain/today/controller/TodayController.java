@@ -19,7 +19,11 @@ public class TodayController {
     private final RoutineService routineService;
 
     @PostMapping("/select")
-    public ResponseDto<Map<String, Object>> retrieveRoutine(@RequestBody @Valid TodaySearchRequestDto reqDto){
-        return ResponseDto.of(routineService.retrieveRoutine(reqDto.getMemberId(), reqDto.getSearchDate()));
+    public ResponseDto<Map<String, Object>> retrieveRoutine(@RequestBody @Valid TodaySearchRequestDto reqDto) {
+        return ResponseDto.of(
+                routineService.retrieveRoutine(
+                        reqDto.getMemberId(),
+                        reqDto.getSearchDate())
+        );
     }
 }
