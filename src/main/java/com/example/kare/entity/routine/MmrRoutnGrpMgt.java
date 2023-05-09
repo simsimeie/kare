@@ -2,6 +2,7 @@ package com.example.kare.entity.routine;
 
 import com.example.kare.entity.BaseTimeEntity;
 import com.example.kare.entity.member.Member;
+import com.example.kare.entity.routine.id.MmrRoutnGrpMgtId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,9 +17,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter(AccessLevel.PRIVATE)
-@IdClass(RoutineGroupId.class)
-@Table(name="MMR_ROUTN_GRP_MGT")
-public class RoutineGroup extends BaseTimeEntity implements Persistable<RoutineGroupId> {
+@IdClass(MmrRoutnGrpMgtId.class)
+public class MmrRoutnGrpMgt extends BaseTimeEntity implements Persistable<MmrRoutnGrpMgtId> {
     @Id
     @Column(name="ROUTN_GRP_SEQ")
     private Integer routnGrpSeq;
@@ -27,16 +27,16 @@ public class RoutineGroup extends BaseTimeEntity implements Persistable<RoutineG
     @JoinColumn(name="MMR_ID")
     private Member member;
     private String routnGrpNm;
-    @OneToMany(mappedBy = "routineGroup")
-    private List<Routine> routines = new ArrayList<>();
+    @OneToMany(mappedBy = "mmrRoutnGrpMgt")
+    private List<MmrRoutnMgt> mmrRoutnMgtList = new ArrayList<>();
     private Integer soOdr;
 
     // ******** 복합키 관련 처리 부분 ********
     @Transient
     private boolean isNew = true;
     @Override
-    public RoutineGroupId getId() {
-        return new RoutineGroupId(this.getRoutnGrpSeq(), this.getMember().getId());
+    public MmrRoutnGrpMgtId getId() {
+        return new MmrRoutnGrpMgtId(this.getRoutnGrpSeq(), this.getMember().getId());
     }
     @Override
     public boolean isNew() {
@@ -50,14 +50,14 @@ public class RoutineGroup extends BaseTimeEntity implements Persistable<RoutineG
 
 
     // ******** 생성 함수 ********
-    public static RoutineGroup createRoutineGroup(Member member, String routnGrpNm, Integer routnGrpSeq, Integer soOdr){
-        RoutineGroup routineGroup = new RoutineGroup();
+    public static MmrRoutnGrpMgt createRoutineGroup(Member member, String routnGrpNm, Integer routnGrpSeq, Integer soOdr){
+        MmrRoutnGrpMgt mmrRoutnGrpMgt = new MmrRoutnGrpMgt();
 
-        routineGroup.setRoutnGrpSeq(routnGrpSeq);
-        routineGroup.setMember(member);
-        routineGroup.setRoutnGrpNm(routnGrpNm);
-        routineGroup.setSoOdr(soOdr);
-        return routineGroup;
+        mmrRoutnGrpMgt.setRoutnGrpSeq(routnGrpSeq);
+        mmrRoutnGrpMgt.setMember(member);
+        mmrRoutnGrpMgt.setRoutnGrpNm(routnGrpNm);
+        mmrRoutnGrpMgt.setSoOdr(soOdr);
+        return mmrRoutnGrpMgt;
     }
 
 }

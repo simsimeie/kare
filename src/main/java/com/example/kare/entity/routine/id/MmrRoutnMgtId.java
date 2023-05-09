@@ -1,4 +1,4 @@
-package com.example.kare.entity.routine;
+package com.example.kare.entity.routine.id;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,11 +11,11 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
-public class RoutineId implements Serializable {
+public class MmrRoutnMgtId implements Serializable {
     private Integer routnSeq;
     private String member;
 
-    public RoutineId(Integer routnSeq, String member) {
+    public MmrRoutnMgtId(Integer routnSeq, String member) {
         this.routnSeq = routnSeq;
         this.member = member;
     }

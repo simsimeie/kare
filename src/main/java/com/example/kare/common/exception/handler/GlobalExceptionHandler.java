@@ -34,6 +34,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         HttpStatus status = getHttpStatus(ex);
         ResponseCommonDto body = getBodyForException(ex);
 
+        log.info("Exception occurred : {}", ex.getMessage(), ex);
+
         return super.handleExceptionInternal(
                 ex
                 ,body
@@ -75,6 +77,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorCode errorCode = ErrorCode.BAD_REQUEST;
         status =  HttpStatus.BAD_REQUEST;
 
+        log.info("Exception occurred : {}", ex.getMessage(), ex);
+
         return super.handleExceptionInternal(
                 ex
                 , new ResponseCommonDto(errorCode, ex.getFieldError().getDefaultMessage())
@@ -92,6 +96,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             Exception ex, @Nullable Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
         ErrorCode errorCode = status.is4xxClientError() ? ErrorCode.BAD_REQUEST : ErrorCode.SERVER_ERROR;
+
+        log.info("Exception occurred : {}", ex.getMessage(), ex);
 
         return super.handleExceptionInternal(
                 ex
@@ -115,6 +121,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<Object> exceptionHandler(Exception ex, WebRequest request){
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        log.info("Exception occurred : {}", ex.getMessage(), ex);
 
         return super.handleExceptionInternal(
                 ex

@@ -1,4 +1,4 @@
-package com.example.kare.entity.routine;
+package com.example.kare.entity.routine.value;
 
 import com.example.kare.common.constant.ErrorCode;
 import com.example.kare.common.exception.KBException;
@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import java.util.Objects;
 
 
 @Embeddable

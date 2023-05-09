@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "of")
-public class TodaySearchRequestDto {
+public class TodaySearchReqDto {
     private String memberId;
     private LocalDate searchDate;
 }

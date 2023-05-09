@@ -1,4 +1,4 @@
-package com.example.kare.entity.routine;
+package com.example.kare.entity.routine.id;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,14 +12,18 @@ import java.time.LocalDate;
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
-public class RoutineDetailId implements Serializable {
+public class MmrRoutnAhvHisId implements Serializable {
+    private LocalDate routnAhvDt;
     private LocalDate routnChDt;
     private Integer routnSeq;
     private String mmrId;
 
-    public RoutineDetailId(LocalDate routnChDt, Integer routnSeq, String mmrId) {
+    public MmrRoutnAhvHisId(LocalDate routnAhvDt, LocalDate routnChDt, Integer routnSeq, String mmrId) {
+        this.routnAhvDt = routnAhvDt;
         this.routnChDt = routnChDt;
         this.routnSeq = routnSeq;
         this.mmrId = mmrId;
     }
+
+
 }

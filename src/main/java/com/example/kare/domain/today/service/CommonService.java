@@ -2,8 +2,8 @@ package com.example.kare.domain.today.service;
 
 
 import com.example.kare.entity.member.Member;
-import com.example.kare.repository.RoutineGroupRepo;
-import com.example.kare.repository.RoutineRepo;
+import com.example.kare.repository.MmrRoutnGrpMgtRepo;
+import com.example.kare.repository.MmrRoutnMgtRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,11 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class CommonService {
 
-    private final RoutineGroupRepo routineGroupRepo;
-    private final RoutineRepo routineRepo;
+    private final MmrRoutnGrpMgtRepo routineGroupRepo;
+    private final MmrRoutnMgtRepo mmrRoutnMgtRepo;
 
     public Integer findMinSoOrd(Member member) {
-        Integer routineSortOrderMinValue = routineRepo.findMinSoOrd(member);
+        Integer routineSortOrderMinValue = mmrRoutnMgtRepo.findMinSoOrd(member);
         Integer routineGroupSortOrderMinValue = routineGroupRepo.findMinSoOrd(member);
 
         log.debug("routineSortOrderMinValue : {} , routineGroupSortOrderMinValue : {} ", routineSortOrderMinValue, routineGroupSortOrderMinValue);

@@ -1,15 +1,13 @@
 package com.example.kare.domain.today.dto;
 
-import com.example.kare.entity.routine.Goal;
+import com.example.kare.entity.routine.value.Goal;
 import com.example.kare.entity.routine.constant.GoalUnit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Max;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 
 @Getter

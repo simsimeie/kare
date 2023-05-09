@@ -1,8 +1,6 @@
 package com.example.kare.domain.today.dto;
 
 
-import com.example.kare.entity.routine.constant.CycleType;
-import com.example.kare.entity.routine.constant.GoalUnit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,15 +11,15 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
-public class RoutineResponseDto {
+public class RoutineResDto {
     private Integer routineSequence;
     private String routineName;
-    private String dayOfWeek;
     private CycleDto cycle;
     private GoalDto goal;
+    private Integer achievementValue;
+    private boolean achievementStatus;
+    private Integer sortOrder;
     private Integer routineGroupSequence;
     private String routineGroupName;
-    private Integer sortOrder;
-
-
+    private Integer routineGroupSortOrder;
 }

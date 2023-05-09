@@ -1,7 +1,7 @@
 package com.example.kare.domain.today.controller;
 
 import com.example.kare.common.dto.ResponseDto;
-import com.example.kare.domain.today.dto.TodaySearchRequestDto;
+import com.example.kare.domain.today.dto.TodaySearchReqDto;
 import com.example.kare.domain.today.service.RoutineService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +19,7 @@ public class TodayController {
     private final RoutineService routineService;
 
     @PostMapping("/select")
-    public ResponseDto<Map<String, Object>> retrieveRoutine(@RequestBody @Valid TodaySearchRequestDto reqDto) {
+    public ResponseDto<Map<String, Object>> retrieveRoutine(@RequestBody @Valid TodaySearchReqDto reqDto) {
         return ResponseDto.of(
                 routineService.retrieveRoutine(
                         reqDto.getMemberId(),

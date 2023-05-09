@@ -1,6 +1,10 @@
 package com.example.kare.entity.routine;
 
 import com.example.kare.entity.BaseTimeEntity;
+import com.example.kare.entity.routine.id.MmrRoutnAhvHisId;
+import com.example.kare.entity.routine.id.MmrRoutnDtlMgtId;
+import com.example.kare.entity.routine.value.Cycle;
+import com.example.kare.entity.routine.value.Goal;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,9 +19,8 @@ import java.time.LocalTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter(AccessLevel.PRIVATE)
-@IdClass(RoutineDetailId.class)
-@Table(name="MMR_ROUTN_DTL_MGT")
-public class RoutineDetail extends BaseTimeEntity implements Persistable<RoutineDetailId> {
+@IdClass(MmrRoutnDtlMgtId.class)
+public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRoutnDtlMgtId> {
     @Id
     @Column(name="ROUTN_CH_DT")
     private LocalDate routnChDt;
@@ -34,7 +37,10 @@ public class RoutineDetail extends BaseTimeEntity implements Persistable<Routine
         @JoinColumn(name = "ROUTN_SEQ", referencedColumnName = "ROUTN_SEQ", insertable = false, updatable = false),
         @JoinColumn(name = "MMR_ID", referencedColumnName = "MMR_ID", insertable = false, updatable = false)
     })
-    private Routine routine;
+    private MmrRoutnMgt mmrRoutnMgt;
+
+
+
     private String routnNm;
     private boolean ntfYn;
     private LocalTime ntfTi;
@@ -61,8 +67,8 @@ public class RoutineDetail extends BaseTimeEntity implements Persistable<Routine
     }
 
     @Override
-    public RoutineDetailId getId() {
-        return new RoutineDetailId(this.routnChDt, this.getRoutnSeq(), this.getMmrId());
+    public MmrRoutnDtlMgtId getId() {
+        return new MmrRoutnDtlMgtId(this.routnChDt, this.getRoutnSeq(), this.getMmrId());
     }
     @Override
     public boolean isNew() {
@@ -72,22 +78,22 @@ public class RoutineDetail extends BaseTimeEntity implements Persistable<Routine
 
 
     // ******** 생성 함수 ********
-    public static RoutineDetail createRoutineHistory(Routine routine, LocalDate startDate){
-        RoutineDetail routineHistory = new RoutineDetail();
+    public static MmrRoutnDtlMgt createRoutineDetails(MmrRoutnMgt mmrRoutnMgt, LocalDate startDate){
+        MmrRoutnDtlMgt routineHistory = new MmrRoutnDtlMgt();
 
         routineHistory.setRoutnChDt(LocalDate.now());
-        routineHistory.setRoutnSeq(routine.getRoutnSeq());
-        routineHistory.setMmrId(routine.getMember().getId());
-        routineHistory.setCycle(routine.getCycle());
-        routineHistory.setGoal(routine.getGoal());
+        routineHistory.setRoutnSeq(mmrRoutnMgt.getRoutnSeq());
+        routineHistory.setMmrId(mmrRoutnMgt.getMember().getId());
+        routineHistory.setCycle(mmrRoutnMgt.getCycle());
+        routineHistory.setGoal(mmrRoutnMgt.getGoal());
         routineHistory.setStartDate(startDate);
-        routineHistory.setEndDate(routine.getEndDate());
+        routineHistory.setEndDate(mmrRoutnMgt.getEndDate());
 
         return routineHistory;
     }
 
     // ******** 비즈니스 로직 ********
-    public boolean isShouldUpdateRoutineHistory(Routine toBe){
+    public boolean isShouldUpdateRoutineHistory(MmrRoutnMgt toBe){
         if(! this.getCycle().equals(toBe.getCycle())){
             return true;
         }
@@ -103,7 +109,7 @@ public class RoutineDetail extends BaseTimeEntity implements Persistable<Routine
         return false;
     }
 
-    public void modifyRoutineCharacter(Routine toBe){
+    public void modifyRoutineCharacter(MmrRoutnMgt toBe){
         this.setCycle(toBe.getCycle());
         this.setGoal(toBe.getGoal());
     }

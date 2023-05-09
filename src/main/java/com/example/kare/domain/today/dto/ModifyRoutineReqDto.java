@@ -1,9 +1,9 @@
 package com.example.kare.domain.today.dto;
 
 import com.example.kare.entity.member.Member;
-import com.example.kare.entity.routine.Cycle;
-import com.example.kare.entity.routine.Goal;
-import com.example.kare.entity.routine.Routine;
+import com.example.kare.entity.routine.value.Cycle;
+import com.example.kare.entity.routine.value.Goal;
+import com.example.kare.entity.routine.MmrRoutnMgt;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,7 @@ import java.time.LocalTime;
 @Setter
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
-public class RoutineRequestDto {
+public class ModifyRoutineReqDto {
     @Positive
     private Integer routineSequence;
     @NotBlank
@@ -39,7 +39,7 @@ public class RoutineRequestDto {
     @FutureOrPresent
     private LocalDate endDate;
 
-    public RoutineRequestDto(
+    public ModifyRoutineReqDto(
             String routineName,
             String memberId,
             Integer routineGroupSequence,
@@ -60,12 +60,12 @@ public class RoutineRequestDto {
         this.endDate = endDate;
     }
 
-    public Routine toEntity(Member member, Integer routineSequence, Integer sortOrder) {
+    public MmrRoutnMgt toEntity(Member member, Integer routineSequence, Integer sortOrder) {
 
         Cycle cycle = this.getCycle().toEntity();
         Goal goal = this.getGoal().toEntity();
 
-        return Routine.createRoutine(
+        return MmrRoutnMgt.createRoutine(
                 this.getRoutineName()
                 , routineSequence
                 , member

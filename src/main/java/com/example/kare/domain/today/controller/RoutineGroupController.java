@@ -2,9 +2,9 @@ package com.example.kare.domain.today.controller;
 
 
 import com.example.kare.common.dto.ResponseDto;
-import com.example.kare.domain.today.dto.RoutineGroupRequestDto;
+import com.example.kare.domain.today.dto.RoutineGroupReqDto;
 import com.example.kare.domain.today.service.RoutineGroupService;
-import com.example.kare.entity.routine.RoutineGroupId;
+import com.example.kare.entity.routine.id.MmrRoutnGrpMgtId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +19,7 @@ import javax.validation.Valid;
 public class RoutineGroupController {
     private final RoutineGroupService routineGroupService;
     @PostMapping("/create")
-    public ResponseDto<RoutineGroupId> createRoutineGroup(@RequestBody @Valid RoutineGroupRequestDto requestDto){
+    public ResponseDto<MmrRoutnGrpMgtId> createRoutineGroup(@RequestBody @Valid RoutineGroupReqDto requestDto){
         return ResponseDto.of(routineGroupService.inputRoutineGroup(requestDto));
     }
 }

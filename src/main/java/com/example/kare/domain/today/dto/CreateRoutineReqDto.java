@@ -10,6 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateRoutineRequestDto {
-    private @Valid List<RoutineRequestDto> routineList;
+public class CreateRoutineReqDto {
+    private @Valid List<CreateRoutineDetailReqDto> routineList;
 }

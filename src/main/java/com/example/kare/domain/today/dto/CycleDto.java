@@ -1,13 +1,11 @@
 package com.example.kare.domain.today.dto;
 
-import com.example.kare.entity.routine.Cycle;
+import com.example.kare.entity.routine.value.Cycle;
 import com.example.kare.entity.routine.constant.CycleType;
 import lombok.*;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter

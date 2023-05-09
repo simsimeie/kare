@@ -1,7 +1,7 @@
 package com.example.kare.domain.today.dto;
 
 import com.example.kare.entity.member.Member;
-import com.example.kare.entity.routine.RoutineGroup;
+import com.example.kare.entity.routine.MmrRoutnGrpMgt;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,14 +14,14 @@ import javax.validation.constraints.NotEmpty;
 @Setter
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
-public class RoutineGroupRequestDto {
+public class RoutineGroupReqDto {
     @NotEmpty
     private String memberId;
     @NotBlank
     private String name;
 
-    public RoutineGroup toEntity(Member member, Integer routnGrpSeq, Integer soOdr) {
-        return RoutineGroup.createRoutineGroup(
+    public MmrRoutnGrpMgt toEntity(Member member, Integer routnGrpSeq, Integer soOdr) {
+        return MmrRoutnGrpMgt.createRoutineGroup(
                 member
                 , this.name
                 , routnGrpSeq

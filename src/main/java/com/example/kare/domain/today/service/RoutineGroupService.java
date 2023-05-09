@@ -3,11 +3,11 @@ package com.example.kare.domain.today.service;
 
 import com.example.kare.common.constant.ErrorCode;
 import com.example.kare.common.exception.KBException;
-import com.example.kare.domain.today.dto.RoutineGroupRequestDto;
+import com.example.kare.domain.today.dto.RoutineGroupReqDto;
 import com.example.kare.entity.member.Member;
-import com.example.kare.entity.routine.RoutineGroup;
-import com.example.kare.entity.routine.RoutineGroupId;
-import com.example.kare.repository.RoutineGroupRepo;
+import com.example.kare.entity.routine.MmrRoutnGrpMgt;
+import com.example.kare.entity.routine.id.MmrRoutnGrpMgtId;
+import com.example.kare.repository.MmrRoutnGrpMgtRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,38 +22,38 @@ import java.util.Optional;
 public class RoutineGroupService {
     private final MemberService memberService;
     private final CommonService commonService;
-    private final RoutineGroupRepo routineGroupRepo;
+    private final MmrRoutnGrpMgtRepo routineGroupRepo;
 
 
     @Transactional
-    public RoutineGroupId inputRoutineGroup(
+    public MmrRoutnGrpMgtId inputRoutineGroup(
             String mmrId,
             String routnGrpNm) {
         Member member = memberService.findMember(mmrId);
         Integer routineGroupSequence = routineGroupRepo.findMaxRoutnGrpSeq(member);
         Integer sortOrder = commonService.findMinSoOrd(member);
 
-        RoutineGroup routineGroup = RoutineGroup.createRoutineGroup(
+        MmrRoutnGrpMgt mmrRoutnGrpMgt = MmrRoutnGrpMgt.createRoutineGroup(
                 member,
                 routnGrpNm,
                 routineGroupSequence,
                 sortOrder
         );
 
-        routineGroupRepo.save(routineGroup);
+        routineGroupRepo.save(mmrRoutnGrpMgt);
 
-        return routineGroup.getId();
+        return mmrRoutnGrpMgt.getId();
     }
 
     @Transactional
-    public RoutineGroupId inputRoutineGroup(RoutineGroupRequestDto routineGroupRequestDto) {
-        RoutineGroup routineGroup = createRoutineGroup(routineGroupRequestDto);
-        routineGroupRepo.save(routineGroup);
+    public MmrRoutnGrpMgtId inputRoutineGroup(RoutineGroupReqDto routineGroupRequestDto) {
+        MmrRoutnGrpMgt mmrRoutnGrpMgt = createRoutineGroup(routineGroupRequestDto);
+        routineGroupRepo.save(mmrRoutnGrpMgt);
 
-        return routineGroup.getId();
+        return mmrRoutnGrpMgt.getId();
     }
 
-    private RoutineGroup createRoutineGroup(RoutineGroupRequestDto routineGroupRequestDto) {
+    private MmrRoutnGrpMgt createRoutineGroup(RoutineGroupReqDto routineGroupRequestDto) {
         Member member = memberService.findMember(routineGroupRequestDto.getMemberId());
         Integer routineGroupSequence = routineGroupRepo.findMaxRoutnGrpSeq(member);
         Integer sortOrder = commonService.findMinSoOrd(member);
@@ -65,8 +65,8 @@ public class RoutineGroupService {
         );
     }
 
-    public RoutineGroup findRoutineGroup(Integer routnGrpSeq, String memberId) {
-        Optional<RoutineGroup> routineGroup = routineGroupRepo.findById(new RoutineGroupId(routnGrpSeq, memberId));
+    public MmrRoutnGrpMgt findRoutineGroup(Integer routnGrpSeq, String memberId) {
+        Optional<MmrRoutnGrpMgt> routineGroup = routineGroupRepo.findById(new MmrRoutnGrpMgtId(routnGrpSeq, memberId));
         if (routineGroup.isEmpty()) {
             throw new KBException("존재하지 않는 루틴 그룹입니다.", ErrorCode.BAD_REQUEST);
         }

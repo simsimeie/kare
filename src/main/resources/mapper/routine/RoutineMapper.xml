@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.kare.mapper.RoutineMapper">
-    <select id="findTodayRoutines" resultType="com.example.kare.domain.today.dto.RoutineResponseDto">
+    <select id="findTodayRoutines" resultType="com.example.kare.domain.today.dto.RoutineResDto">
         select a.routine_id
              , a.name as routineName
              , #{dayOfWeek} as dayOfWeek
@@ -14,7 +14,7 @@
              , a.display_order
              , c.routine_group_id
              , c.name as routineGroupName
-        from routine a left outer join link_routine_group b on a.link_routine_group_id = b.link_routine_group_id
+        from mmrRoutnMgt a left outer join link_routine_group b on a.link_routine_group_id = b.link_routine_group_id
                        left outer join routine_group c on b.routine_group_id = c.routine_group_id
         where 1=1
           and a.member_id = #{memberId}

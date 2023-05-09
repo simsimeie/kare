@@ -1,23 +1,21 @@
-package com.example.kare.entity.routine;
+package com.example.kare.entity.routine.id;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 
 @Getter
 @Setter
 @EqualsAndHashCode
-public class RoutineGroupId implements Serializable {
+@NoArgsConstructor
+public class MmrRoutnGrpMgtId implements Serializable {
     private Integer routnGrpSeq;
     private String member;
-
-    public RoutineGroupId() {
-    }
-
-    public RoutineGroupId(Integer routnGrpSeq, String member) {
+    
+    public MmrRoutnGrpMgtId(Integer routnGrpSeq, String member) {
         this.routnGrpSeq = routnGrpSeq;
         this.member = member;
     }

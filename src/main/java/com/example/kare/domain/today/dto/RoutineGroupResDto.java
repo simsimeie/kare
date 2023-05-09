@@ -5,21 +5,23 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Getter
 @Setter
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
 @EqualsAndHashCode
-public class RoutineGroupResponseDto {
+public class RoutineGroupResDto {
     private Integer routineGroupSequence;
     private String routineGroupName;
-    private List<RoutineResponseDto> routines = new ArrayList<>();
-    private Integer totalCount;
-    private Integer completeCount;
+    private Integer totalRoutineNum;
+    private Integer completeRoutineNum;
+    private boolean routineGroupCompleteStatus;
+    private Integer sortOrder;
+    private List<RoutineResDto> routines = new ArrayList<>();
 
-    public RoutineGroupResponseDto(Integer routineGroupSequence, String routineGroupName) {
+
+    public RoutineGroupResDto(Integer routineGroupSequence, String routineGroupName) {
         this.routineGroupSequence = routineGroupSequence;
         this.routineGroupName = routineGroupName;
     }

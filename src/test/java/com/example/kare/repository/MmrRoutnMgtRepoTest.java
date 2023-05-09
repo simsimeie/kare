@@ -8,18 +8,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 @DataJpaTest
-class RoutineRepoTest {
+class MmrRoutnMgtRepoTest {
     @Autowired
     private TestEntityManager em;
     @Autowired
-    private RoutineRepo routineRepo;
+    private MmrRoutnMgtRepo mmrRoutnMgtRepo;
     private Member testMember;
 
     @BeforeEach
