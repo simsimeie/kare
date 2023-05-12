@@ -1,9 +1,9 @@
-package com.example.kare.domain.today.controller;
+package com.example.kare.domain.routine.controller;
 
 import com.example.kare.common.dto.ResponseDto;
-import com.example.kare.domain.today.dto.CreateRoutineReqDto;
+import com.example.kare.domain.routine.dto.CreateRoutineReqDto;
 import com.example.kare.domain.today.dto.ModifyRoutineReqDto;
-import com.example.kare.domain.today.service.RoutineService;
+import com.example.kare.domain.routine.service.RoutineService;
 import com.example.kare.entity.routine.id.MmrRoutnMgtId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

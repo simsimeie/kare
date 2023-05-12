@@ -2,7 +2,7 @@ package com.example.kare.entity.routine.value;
 
 import com.example.kare.common.constant.ErrorCode;
 import com.example.kare.common.exception.KBException;
-import com.example.kare.domain.today.dto.CycleDto;
+import com.example.kare.domain.routine.dto.CycleDto;
 import com.example.kare.entity.routine.constant.CycleType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

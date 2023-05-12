@@ -1,19 +1,18 @@
-package com.example.kare.domain.routinedetail.dto;
+package com.example.kare.domain.routinegroup.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
-public class CreateRoutineAchieveReqDto {
-    private @Valid List<CreateRoutineAchieveDetailReqDto> routineList;
-
+public class RetrieveRoutineGroupResDto {
+    private List<CommonRoutineGroupResDto> detailResDtoList = new ArrayList<>();
 
 }

@@ -60,4 +60,8 @@ public class MmrRoutnGrpMgt extends BaseTimeEntity implements Persistable<MmrRou
         return mmrRoutnGrpMgt;
     }
 
+    // ******** 비즈니스 로직 ********
+    public void changeRoutineGroupName(String newName){
+        this.setRoutnGrpNm(newName);
+    }
 }

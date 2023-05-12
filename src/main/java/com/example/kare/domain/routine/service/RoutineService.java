@@ -1,8 +1,14 @@
-package com.example.kare.domain.today.service;
+package com.example.kare.domain.routine.service;
 
 import com.example.kare.common.constant.ErrorCode;
 import com.example.kare.common.exception.KBException;
+import com.example.kare.domain.routine.dto.CreateRoutineDetailReqDto;
+import com.example.kare.domain.routine.dto.CreateRoutineReqDto;
+import com.example.kare.domain.today.dto.RoutineGroupResDto;
 import com.example.kare.domain.today.dto.*;
+import com.example.kare.domain.today.service.CommonService;
+import com.example.kare.domain.today.service.MemberService;
+import com.example.kare.domain.routinegroup.service.RoutineGroupService;
 import com.example.kare.entity.member.Member;
 import com.example.kare.entity.routine.*;
 import com.example.kare.entity.routine.id.MmrRoutnGrpMgtId;
@@ -87,45 +93,7 @@ public class RoutineService {
     }
 
 
-    public Map<String, Object> retrieveRoutine(String memberId, LocalDate searchDate) {
-        List<RoutineResDto> routineList = new ArrayList<>();
-        Set<RoutineGroupResDto> routineGroupSet = new HashSet<>();
-        Map<Integer, List<RoutineResDto>> mapByRoutineGroup = new HashMap<>();
-        Map<String, Object> result = new HashMap<>();
 
-        List<RoutineResDto> todayRoutineList = mmrRoutnMgtRepo.findTodayRoutines(memberId, searchDate);
-        todayRoutineList.forEach(routine -> {
-            if (null != routine.getRoutineGroupSequence()) {
-                routineGroupSet.add(new RoutineGroupResDto(routine.getRoutineGroupSequence(), routine.getRoutineGroupName()));
-                List<RoutineResDto> list = Optional.ofNullable(mapByRoutineGroup.get(routine.getRoutineGroupSequence())).orElseGet(ArrayList::new);
-                list.add(routine);
-                mapByRoutineGroup.put(routine.getRoutineGroupSequence(), list);
-            } else {
-                routineList.add(routine);
-            }
-        });
-
-        for (RoutineGroupResDto group : routineGroupSet) {
-            List<RoutineResDto> routinesInGroup = mapByRoutineGroup.get(group.getRoutineGroupSequence());
-            group.setRoutines(routinesInGroup);
-            group.setTotalRoutineNum(routinesInGroup.size());
-            group.setCompleteRoutineNum(
-                    (int) routinesInGroup
-                            .stream()
-                            .filter(routineResDto -> routineResDto.isAchievementStatus() == true)
-                            .count()
-            );
-
-            boolean completeStatus = group.getTotalRoutineNum() <= group.getCompleteRoutineNum() ? true : false;
-            group.setRoutineGroupCompleteStatus(completeStatus);
-            group.setSortOrder(routinesInGroup.get(0).getRoutineGroupSortOrder());
-        }
-
-        result.put("routineList", routineList);
-        result.put("routineGroupList", routineGroupSet);
-
-        return result;
-    }
 
     @Transactional
     public MmrRoutnMgtId modifyRoutine(ModifyRoutineReqDto reqDto) {
@@ -143,7 +111,7 @@ public class RoutineService {
             // 따라서, start date가 변경된 경우에는 업데이트만 해주면 된다.
             if (!routineDetail.getStartDate().equals(mmrRoutnMgt.getStartDate())) {
                 routineDetail.modifyRoutineCharacter(mmrRoutnMgt);
-                routineDetail.modifyRoutineStartDate(mmrRoutnMgt.getStartDate());
+                routineDetail.modifyRoutineDetailStartDate(mmrRoutnMgt.getStartDate());
                 //routineHistoryRepository.save(routineHistory);
             }
             // 현재 <= Last History의 start date < 변경할 start date : history insert
@@ -151,12 +119,12 @@ public class RoutineService {
                 // 오늘 생성해서 오늘 주기나 목표를 변경한 경우에는 history 업데이트
                 if (Period.between(routineDetail.getRoutnChDt(), LocalDate.now()).isZero()) {
                     routineDetail.modifyRoutineCharacter(mmrRoutnMgt);
-                    routineDetail.modifyRoutineStartDate(LocalDate.now());
+                    routineDetail.modifyRoutineDetailStartDate(LocalDate.now());
                     mmrRoutnDtlMgtRepo.save(routineDetail);
                 }
                 // 그 외는 insert
                 else {
-                    routineDetail.modifyRoutineHistoryEndDate(LocalDate.now().minusDays(1));
+                    routineDetail.modifyRoutineDetailEndDate(LocalDate.now().minusDays(1));
                     mmrRoutnDtlMgtRepo.save(routineDetail);
                     MmrRoutnDtlMgt newRoutineHistory = MmrRoutnDtlMgt.createRoutineDetails(mmrRoutnMgt, LocalDate.now());
                     mmrRoutnDtlMgtRepo.save(newRoutineHistory);
@@ -181,6 +149,13 @@ public class RoutineService {
         }
         return routine.get();
     }
+
+    @Transactional
+    public Integer modifyRoutineGroupSeqToNull(Integer routineGroupSeq,String memberId){
+        return mmrRoutnMgtRepo.bulkRoutineGroupSeqUpdateToNull(routineGroupSeq, memberId);
+    }
+
+
 
 
 }

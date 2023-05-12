@@ -1,6 +1,7 @@
 package com.example.kare.domain.today.dto;
 
 
+import com.example.kare.domain.today.dto.RoutineResDto;
 import lombok.*;
 
 import java.util.ArrayList;

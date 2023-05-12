@@ -1,9 +1,9 @@
 package com.example.kare.entity.routine;
 
+import com.example.kare.domain.routine.dto.GoalDto;
 import com.example.kare.entity.BaseTimeEntity;
+import com.example.kare.entity.routine.constant.AchieveStatus;
 import com.example.kare.entity.routine.id.MmrRoutnAhvHisId;
-import com.example.kare.entity.routine.id.MmrRoutnDtlMgtId;
-import com.example.kare.entity.routine.id.MmrRoutnGrpMgtId;
 import com.example.kare.entity.routine.value.Goal;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,6 +34,8 @@ public class MmrRoutnAhvHis extends BaseTimeEntity implements Persistable<MmrRou
     private String mmrId;
     @Embedded
     private Goal goal;
+    @Enumerated(EnumType.STRING)
+    private AchieveStatus golAhvYn;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
@@ -72,7 +74,8 @@ public class MmrRoutnAhvHis extends BaseTimeEntity implements Persistable<MmrRou
             LocalDate routnChDt,
             Integer routnSeq,
             String mmrId,
-            Goal goal
+            Goal goal,
+            AchieveStatus status
     ){
         MmrRoutnAhvHis achievement = new MmrRoutnAhvHis();
         achievement.setRoutnAhvDt(routnAhvDt);
@@ -80,7 +83,19 @@ public class MmrRoutnAhvHis extends BaseTimeEntity implements Persistable<MmrRou
         achievement.setRoutnSeq(routnSeq);
         achievement.setMmrId(mmrId);
         achievement.setGoal(goal);
+        achievement.setGolAhvYn(status);
 
         return achievement;
+    }
+
+
+    // ******** 비즈니스 로직 ********
+    public void changeGoalValue(GoalDto goalDto){
+        Goal goal = Goal.createGoal(goalDto);
+        this.setGoal(goal);
+    }
+
+    public void setGoalAchievementStatus(AchieveStatus status){
+        this.setGolAhvYn(status);
     }
 }

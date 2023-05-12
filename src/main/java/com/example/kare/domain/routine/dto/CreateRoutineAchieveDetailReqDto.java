@@ -1,4 +1,4 @@
-package com.example.kare.domain.routinedetail.dto;
+package com.example.kare.domain.routine.dto;
 
 import com.example.kare.entity.routine.MmrRoutnAhvHis;
 import com.example.kare.entity.routine.value.Goal;
@@ -19,5 +19,6 @@ public class CreateRoutineAchieveDetailReqDto {
     private String memberId;
     @PastOrPresent
     private LocalDate requestDate;
+    private GoalDto goal;
 
 }

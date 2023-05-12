@@ -20,8 +20,7 @@ class MmrRoutnMgtRepoTest {
     private Member testMember;
 
     @BeforeEach
-    public void init(){
-        testMember = MemberTest.createMemberForTest();
+    public void setUp(){
     }
 
     @Test

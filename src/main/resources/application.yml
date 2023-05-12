@@ -5,6 +5,10 @@ spring:
     password:
     driver-class-name: org.h2.Driver
 
+    #url: jdbc:postgresql://url:5432/kare
+    #username: postgres
+    #password: postgres
+
   jpa:
     hibernate:
       ddl-auto: create

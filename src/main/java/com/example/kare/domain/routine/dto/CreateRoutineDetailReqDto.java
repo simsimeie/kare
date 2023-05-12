@@ -1,9 +1,5 @@
-package com.example.kare.domain.today.dto;
+package com.example.kare.domain.routine.dto;
 
-import com.example.kare.entity.member.Member;
-import com.example.kare.entity.routine.value.Cycle;
-import com.example.kare.entity.routine.value.Goal;
-import com.example.kare.entity.routine.MmrRoutnMgt;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

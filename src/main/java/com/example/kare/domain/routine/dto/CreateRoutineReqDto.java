@@ -1,4 +1,4 @@
-package com.example.kare.domain.today.dto;
+package com.example.kare.domain.routine.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

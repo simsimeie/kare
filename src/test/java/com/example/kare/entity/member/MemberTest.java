@@ -10,11 +10,11 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MemberTest {
-    public static Member createMemberForTest(){
+    public static Member createMemberForTest(String name){
 
         return Member.createMember(
                 UUID.randomUUID().toString(),
-                "테스트",
+                name,
                 LocalDate.of(2000, Month.MARCH, 20),
                 "010-1111-1111",
                 Sex.MALE

@@ -1,4 +1,4 @@
-package com.example.kare.domain.today.dto;
+package com.example.kare.domain.routine.dto;
 
 import com.example.kare.entity.routine.value.Cycle;
 import com.example.kare.entity.routine.constant.CycleType;
