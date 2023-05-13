@@ -23,7 +23,8 @@ public class RoutineResDto {
     private boolean achievementStatus;
     private Integer sortOrder;
     private Integer routineGroupSortOrder;
-    private int targetDatesNum;
+    private int goalNumPerWeek;
+    private int completedNumPerWeek;
     @JsonIgnore
     private Integer routineGroupSequence;
     @JsonIgnore

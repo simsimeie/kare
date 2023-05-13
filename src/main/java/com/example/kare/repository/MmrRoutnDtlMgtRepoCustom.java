@@ -11,6 +11,6 @@ import java.util.Set;
 public interface MmrRoutnDtlMgtRepoCustom {
     LocalDate findValidRoutineChangeDate(Integer routnSeq, String mmrId, LocalDate searchDate);
     Optional<MmrRoutnDtlMgt> findValidRoutineDetail(Integer routnSeq, String mmrId, LocalDate searchDate);
-    List<MmrRoutnDtlMgt> findValidRoutineDetailList(Set<Integer> routnSeqSet, String mmrId, LocalDate startDate, LocalDate LastDate);
+    List<MmrRoutnDtlMgt> findValidRoutineDetailList(String mmrId, LocalDate startDate, LocalDate LastDate, Set<Integer> routnSeqSet);
 
 }

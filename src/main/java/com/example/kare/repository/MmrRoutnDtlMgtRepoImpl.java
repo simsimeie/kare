@@ -49,8 +49,8 @@ public class MmrRoutnDtlMgtRepoImpl implements MmrRoutnDtlMgtRepoCustom {
     }
 
     @Override
-    public List<MmrRoutnDtlMgt> findValidRoutineDetailList(Set<Integer> routnSeqSet, String mmrId, LocalDate startDate, LocalDate endDate) {
-        List<Tuple> tuples = findValidRoutineDetailCondition(routnSeqSet, mmrId, startDate);
+    public List<MmrRoutnDtlMgt> findValidRoutineDetailList(String mmrId, LocalDate startDate, LocalDate endDate, Set<Integer> routnSeqSet) {
+        List<Tuple> tuples = findValidRoutineDetailCondition(mmrId, startDate, routnSeqSet);
 
         return jpaQueryFactory
                 .select(mmrRoutnDtlMgt)
@@ -62,7 +62,8 @@ public class MmrRoutnDtlMgtRepoImpl implements MmrRoutnDtlMgtRepoCustom {
                 .orderBy(mmrRoutnDtlMgt.routnSeq.asc(), mmrRoutnDtlMgt.routnChDt.asc())
                 .fetch();
     }
-    public List<Tuple> findValidRoutineDetailCondition(Set<Integer> routnSeqSet, String mmrId, LocalDate startDate) {
+
+    public List<Tuple> findValidRoutineDetailCondition(String mmrId, LocalDate startDate, Set<Integer> routnSeqSet) {
         return jpaQueryFactory
                 .select(mmrRoutnDtlMgt.routnSeq, mmrRoutnDtlMgt.routnChDt.max())
                 .from(mmrRoutnDtlMgt)
@@ -86,8 +87,9 @@ public class MmrRoutnDtlMgtRepoImpl implements MmrRoutnDtlMgtRepoCustom {
                 )
         );
     }
+
     private BooleanExpression changeDateConditions(List<Tuple> conditions) {
-        if(conditions.isEmpty()) return null;
+        if (conditions.isEmpty()) return null;
 
         BooleanExpression combinedExpression = Expressions.asBoolean(false).isTrue();
 
@@ -100,8 +102,6 @@ public class MmrRoutnDtlMgtRepoImpl implements MmrRoutnDtlMgtRepoCustom {
         }
         return combinedExpression;
     }
-
-
 
 
 }

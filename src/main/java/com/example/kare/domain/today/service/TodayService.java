@@ -4,7 +4,9 @@ import com.example.kare.domain.calendar.dto.DateDto;
 import com.example.kare.domain.calendar.service.Calculator;
 import com.example.kare.domain.today.dto.RoutineGroupResDto;
 import com.example.kare.domain.today.dto.RoutineResDto;
+import com.example.kare.entity.routine.MmrRoutnAhvHis;
 import com.example.kare.entity.routine.MmrRoutnDtlMgt;
+import com.example.kare.repository.MmrRoutnAchHisRepo;
 import com.example.kare.repository.MmrRoutnDtlMgtRepo;
 import com.example.kare.repository.MmrRoutnMgtRepo;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import java.util.*;
 public class TodayService {
     private final MmrRoutnMgtRepo mmrRoutnMgtRepo;
     private final MmrRoutnDtlMgtRepo mmrRoutnDtlMgtRepo;
+    private final MmrRoutnAchHisRepo mmrRoutnAchHisRepo;
     private final Calculator calculator;
 
     public Map<String, Object> findTodayRoutines(String memberId, LocalDate searchDate) {
@@ -42,11 +45,11 @@ public class TodayService {
         // 이번주 시작일, 종료일 추출
         DateDto weekCriteria = calculator.getWeekCriteria(searchDate);
         // 시작일 ~ 종료일에 해당하는 루틴 상세 추출
-        List<MmrRoutnDtlMgt> routineDetails = mmrRoutnDtlMgtRepo.findValidRoutineDetailList(
-                routineDtoMap.keySet(),
+        List<MmrRoutnDtlMgt> routineDetailList = mmrRoutnDtlMgtRepo.findValidRoutineDetailList(
                 memberId,
                 weekCriteria.getStartDate(),
-                weekCriteria.getEndDate()
+                weekCriteria.getEndDate(),
+                routineDtoMap.keySet()
         );
 
         // 상세 루프 돌면서
@@ -57,7 +60,7 @@ public class TodayService {
         LocalDate firstDate;
         LocalDate endDate = weekCriteria.getEndDate();
 
-        ListIterator<MmrRoutnDtlMgt> iterator = routineDetails.listIterator(routineDetails.size());
+        ListIterator<MmrRoutnDtlMgt> iterator = routineDetailList.listIterator(routineDetailList.size());
         while (iterator.hasPrevious()) {
             MmrRoutnDtlMgt routineDetail = iterator.previous();
 
@@ -69,7 +72,7 @@ public class TodayService {
 
             int targetDatesNum = routineDetail.getNumOfTargetDates(firstDate, endDate);
             RoutineResDto routineResDto = routineDtoMap.get(routineDetail.getRoutnSeq());
-            routineResDto.setTargetDatesNum(routineResDto.getTargetDatesNum() + targetDatesNum);
+            routineResDto.setGoalNumPerWeek(routineResDto.getGoalNumPerWeek() + targetDatesNum);
 
             nextRoutineSeq = routineDetail.getRoutnSeq();
             nextRoutineDetailChangeDate = routineDetail.getRoutnChDt();
@@ -82,6 +85,17 @@ public class TodayService {
 //        }
 
         // TODO : 달성일 추출 로직
+        List<MmrRoutnAhvHis> completedAchievementList = mmrRoutnAchHisRepo.findCompletedAchievementList(
+                memberId,
+                weekCriteria.getStartDate(),
+                weekCriteria.getEndDate(),
+                routineDtoMap.keySet()
+        );
+
+        completedAchievementList.forEach(achievement -> {
+            RoutineResDto routineResDto = routineDtoMap.get(achievement.getRoutnSeq());
+            routineResDto.setCompletedNumPerWeek(routineResDto.getCompletedNumPerWeek() + 1);
+        });
 
 
         // Grouping
