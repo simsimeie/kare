@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.*;
 
 @Service
@@ -48,15 +49,37 @@ public class TodayService {
                 weekCriteria.getEndDate()
         );
 
-
         // 상세 루프 돌면서
-        // max(이전루틴변경일자, 이번주 시작일, 루틴시작일) , min(다음루틴변경일자, 이번주 종료일, 루틴 종료일)
+        // max(루틴변경일자, 이번주 시작일, 루틴시작일) , min(다음루틴상세의 변경일자, 이번주 종료일, 루틴 종료일)
         // TODO
-        for (MmrRoutnDtlMgt routineDetail : routineDetails) {
-            int targetDatesNum = routineDetail.getNumOfTargetDates(weekCriteria.getStartDate(), weekCriteria.getEndDate());
+        Integer nextRoutineSeq = 0;
+        LocalDate nextRoutineDetailChangeDate = LocalDate.of(9999, Month.DECEMBER, 31);
+        LocalDate firstDate;
+        LocalDate endDate = weekCriteria.getEndDate();
+
+        ListIterator<MmrRoutnDtlMgt> iterator = routineDetails.listIterator(routineDetails.size());
+        while (iterator.hasPrevious()) {
+            MmrRoutnDtlMgt routineDetail = iterator.previous();
+
+            firstDate = weekCriteria.getStartDate().isAfter(routineDetail.getRoutnChDt()) ? weekCriteria.getStartDate() : routineDetail.getRoutnChDt();
+
+            if (routineDetail.getRoutnSeq().equals(nextRoutineSeq)) {
+                endDate = endDate.isBefore(nextRoutineDetailChangeDate) ? endDate : nextRoutineDetailChangeDate.minusDays(1);
+            }
+
+            int targetDatesNum = routineDetail.getNumOfTargetDates(firstDate, endDate);
             RoutineResDto routineResDto = routineDtoMap.get(routineDetail.getRoutnSeq());
             routineResDto.setTargetDatesNum(routineResDto.getTargetDatesNum() + targetDatesNum);
+
+            nextRoutineSeq = routineDetail.getRoutnSeq();
+            nextRoutineDetailChangeDate = routineDetail.getRoutnChDt();
         }
+
+//        for (MmrRoutnDtlMgt routineDetail : routineDetails) {
+//            int targetDatesNum = routineDetail.getNumOfTargetDates(weekCriteria.getStartDate(), weekCriteria.getEndDate());
+//            RoutineResDto routineResDto = routineDtoMap.get(routineDetail.getRoutnSeq());
+//            routineResDto.setTargetDatesNum(routineResDto.getTargetDatesNum() + targetDatesNum);
+//        }
 
         // TODO : 달성일 추출 로직
 

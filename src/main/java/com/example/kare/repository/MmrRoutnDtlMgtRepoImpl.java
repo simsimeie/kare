@@ -87,6 +87,8 @@ public class MmrRoutnDtlMgtRepoImpl implements MmrRoutnDtlMgtRepoCustom {
         );
     }
     private BooleanExpression changeDateConditions(List<Tuple> conditions) {
+        if(conditions.isEmpty()) return null;
+
         BooleanExpression combinedExpression = Expressions.asBoolean(false).isTrue();
 
         for (Tuple tuple : conditions) {
