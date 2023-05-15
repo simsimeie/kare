@@ -30,30 +30,58 @@ public class RoutineDetailService {
     private final MmrRoutnAchHisRepo mmrRoutnAchHisRepo;
 
     @Transactional
-    public void inputRoutineAchievement(CreateRoutineAchieveReqDto createRoutineAchieveReqDto) {
+    public void saveRoutineAchievement(CreateRoutineAchieveReqDto createRoutineAchieveReqDto) {
+        LocalDate requestDate = createRoutineAchieveReqDto.getRequestDate();
+        String memberId = createRoutineAchieveReqDto.getMemberId();
+
         for (CreateRoutineAchieveDetailReqDto reqDto : createRoutineAchieveReqDto.getRoutineList()) {
             Optional<MmrRoutnDtlMgt> routineDetailResult = mmrRoutnDtlMgtRepo.findValidRoutineDetail(
                     reqDto.getRoutineSequence(),
-                    reqDto.getMemberId(),
-                    reqDto.getRequestDate()
+                    memberId,
+                    requestDate
             );
-
             if(routineDetailResult.isEmpty()){
                 throw new KBException("루틴 시작일 이후의 루틴에 대해서만 완료가 가능합니다.", ErrorCode.BAD_REQUEST);
             }
-            MmrRoutnDtlMgt routineDetail = routineDetailResult.get();
-            validationCheck(routineDetail, reqDto);
 
-            Optional<MmrRoutnAhvHis> routineHistoryResult = findRoutineAchievement(routineDetail, reqDto.getRequestDate());
+            MmrRoutnDtlMgt routineDetail = routineDetailResult.get();
+            validationCheck(routineDetail, reqDto, requestDate);
+
+            Optional<MmrRoutnAhvHis> routineHistoryResult = findRoutineAchievement(routineDetail, requestDate);
             // 배경 : 달성치 변경은 오직 값만 변경이 가능하다. 목표유형과 목표단위는 변경할 수 없다.
             if (routineHistoryResult.isPresent()) {
                 MmrRoutnAhvHis routineAchievement = routineHistoryResult.get();
-                updateRoutineAchievement(reqDto, routineDetail, routineAchievement);
+                updateRoutineAchievement(routineDetail, reqDto, routineAchievement);
             } else {
-                MmrRoutnAhvHis routineAchievement = createRoutineAchievement(routineDetail, reqDto);
+                MmrRoutnAhvHis routineAchievement = createRoutineAchievement(routineDetail, reqDto, requestDate);
                 mmrRoutnAchHisRepo.save(routineAchievement);
             }
         }
+    }
+
+    public void validationCheck(MmrRoutnDtlMgt routineDetail,
+                                CreateRoutineAchieveDetailReqDto reqDto,
+                                LocalDate requestDate) {
+
+        if (routineDetail.getGoal().getGolTpCd().equals(1)) {
+            if (reqDto.getGoal().getGoalUnitTypeCode() != null
+                    || reqDto.getGoal().getGoalValue() != null
+                    || !reqDto.getGoal().getGoalTypeCode().equals(1)) {
+                throw new KBException("설정하신 목표유형,단위로만 입력하실 수 있습니다.", ErrorCode.BAD_REQUEST);
+            }
+        }
+        else {
+            if (!routineDetail.getGoal().getGolUnitTpCd().equals(reqDto.getGoal().getGoalUnitTypeCode())
+                    || !routineDetail.getGoal().getGolTpCd().equals(reqDto.getGoal().getGoalTypeCode())) {
+                throw new KBException("설정하신 목표유형,단위로만 입력하실 수 있습니다.", ErrorCode.BAD_REQUEST);
+            }
+        }
+
+        if (Period.between(routineDetail.getStartDate(), requestDate).isNegative()){
+            throw new KBException("루틴 시작일 이후의 루틴에 대해서만 완료가 가능합니다.", ErrorCode.BAD_REQUEST);
+        }
+
+
     }
 
     private Optional<MmrRoutnAhvHis> findRoutineAchievement(MmrRoutnDtlMgt routineDetail, LocalDate requestDate) {
@@ -66,7 +94,9 @@ public class RoutineDetailService {
         return mmrRoutnAchHisRepo.findById(id);
     }
 
-    private void updateRoutineAchievement(CreateRoutineAchieveDetailReqDto reqDto, MmrRoutnDtlMgt routineDetail, MmrRoutnAhvHis achievement) {
+    private void updateRoutineAchievement(MmrRoutnDtlMgt routineDetail,
+                                          CreateRoutineAchieveDetailReqDto reqDto,
+                                          MmrRoutnAhvHis achievement) {
         if (routineDetail.getGoal().getGolTpCd().equals(1)) {
             achievement.setGoalAchievementStatus(AchieveStatus.Y);
         } else {
@@ -80,10 +110,10 @@ public class RoutineDetailService {
         achievement.changeGoalValue(reqDto.getGoal());
     }
 
-    private MmrRoutnAhvHis createRoutineAchievement(MmrRoutnDtlMgt routineDetail, CreateRoutineAchieveDetailReqDto achievementDto) {
+    private MmrRoutnAhvHis createRoutineAchievement(MmrRoutnDtlMgt routineDetail,
+                                                    CreateRoutineAchieveDetailReqDto achievementDto,
+                                                    LocalDate requestDate) {
         AchieveStatus status = AchieveStatus.N;
-
-        validationCheck(routineDetail, achievementDto);
 
         if (routineDetail.getGoal().getGolTpCd().equals(1)) {
             status = AchieveStatus.Y;
@@ -92,7 +122,7 @@ public class RoutineDetailService {
         }
 
         return MmrRoutnAhvHis.createRoutineAchievement(
-                achievementDto.getRequestDate(),
+                requestDate,
                 routineDetail.getRoutnChDt(),
                 routineDetail.getRoutnSeq(),
                 routineDetail.getMmrId(),
@@ -101,24 +131,7 @@ public class RoutineDetailService {
         );
     }
 
-    public void validationCheck(MmrRoutnDtlMgt routineDetail, CreateRoutineAchieveDetailReqDto reqDto) {
-        if (routineDetail.getGoal().getGolTpCd().equals(1)) {
-            if (reqDto.getGoal().getGoalUnitTypeCode() != null
-                    || reqDto.getGoal().getGoalValue() != null
-                    || !reqDto.getGoal().getGoalTypeCode().equals(1)) {
-                throw new KBException("설정하신 목표유형,단위로만 입력하실 수 있습니다.", ErrorCode.BAD_REQUEST);
-            }
-        } else {
-            if (!routineDetail.getGoal().getGolUnitTpCd().equals(reqDto.getGoal().getGoalUnitTypeCode())
-                    || !routineDetail.getGoal().getGolTpCd().equals(reqDto.getGoal().getGoalTypeCode())) {
-                throw new KBException("설정하신 목표유형,단위로만 입력하실 수 있습니다.", ErrorCode.BAD_REQUEST);
-            }
-        }
 
-        if (Period.between(routineDetail.getStartDate(), reqDto.getRequestDate()).isNegative()){
-            throw new KBException("루틴 시작일 이후의 루틴에 대해서만 완료가 가능합니다.", ErrorCode.BAD_REQUEST);
-        }
-    }
 
     @Transactional
     public void deleteRoutine(Integer routnSeq, String memberId) {

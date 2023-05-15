@@ -16,9 +16,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class CreateRoutineAchieveDetailReqDto {
     private Integer routineSequence;
-    private String memberId;
-    @PastOrPresent
-    private LocalDate requestDate;
     private GoalDto goal;
 
 }

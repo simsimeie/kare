@@ -26,7 +26,7 @@ class MmrRoutnGrpMgtRepoTest {
 
 
     @BeforeEach
-    public void setUp(){
+    public void setup(){
         testMember1 = MemberTest.createMemberForTest("테스트1");
         testMember2 = MemberTest.createMemberForTest("테스트2");
 
@@ -38,11 +38,11 @@ class MmrRoutnGrpMgtRepoTest {
     @DisplayName("Member Entity 기반으로 MmrRoutnGrpMgt 리스트 가져오는지 테스트")
     public void findMmrRoutnGrpMgtByMemberTest01(){
 
-        MmrRoutnGrpMgt group1 = createRoutineGroup(testMember1, "테스트그룹1", 1, 1);
-        MmrRoutnGrpMgt group2 = createRoutineGroup(testMember1, "테스트그룹2", 2, 2);
-        MmrRoutnGrpMgt group3 = createRoutineGroup(testMember1, "테스트그룹3", 3, 3);
-        MmrRoutnGrpMgt group4 = createRoutineGroup(testMember1, "테스트그룹4", 4, 4);
-        MmrRoutnGrpMgt group5 = createRoutineGroup(testMember2, "테스트그룹5", 1, 1);
+        MmrRoutnGrpMgt group1 = MmrRoutnGrpMgt.createRoutineGroup(testMember1, "테스트그룹1", 1, 1);
+        MmrRoutnGrpMgt group2 = MmrRoutnGrpMgt.createRoutineGroup(testMember1, "테스트그룹2", 2, 2);
+        MmrRoutnGrpMgt group3 = MmrRoutnGrpMgt.createRoutineGroup(testMember1, "테스트그룹3", 3, 3);
+        MmrRoutnGrpMgt group4 = MmrRoutnGrpMgt.createRoutineGroup(testMember1, "테스트그룹4", 4, 4);
+        MmrRoutnGrpMgt group5 = MmrRoutnGrpMgt.createRoutineGroup(testMember2, "테스트그룹5", 1, 1);
 
         mmrRoutnGrpMgtRepo.save(group1);
         mmrRoutnGrpMgtRepo.save(group2);
@@ -56,24 +56,6 @@ class MmrRoutnGrpMgtRepoTest {
         assertEquals(4, testMember1Group.size());
         assertEquals(1, testMember2Group.size());
 
-    }
-
-
-
-
-    public static MmrRoutnGrpMgt createRoutineGroup(
-            Member member,
-            String routineGroupName,
-            Integer routineGroupSequence,
-            Integer sortOrder
-    ){
-
-        return MmrRoutnGrpMgt.createRoutineGroup(
-                member,
-                routineGroupName,
-                routineGroupSequence,
-                sortOrder
-        );
     }
 
 }

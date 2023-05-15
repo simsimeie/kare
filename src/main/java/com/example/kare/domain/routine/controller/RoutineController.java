@@ -15,17 +15,12 @@ import javax.validation.Valid;
 @RequestMapping("/v1/routine")
 public class RoutineController {
     private final RoutineService routineService;
-
     @PostMapping("/create")
     public ResponseDto<Integer> createRoutine(@RequestBody @Valid CreateRoutineReqDto reqDto){
         return ResponseDto.of(routineService.inputRoutine(reqDto));
     }
-
     @PutMapping("/update")
     public ResponseDto<MmrRoutnMgtId> modifyRoutine(@RequestBody @Valid ModifyRoutineReqDto reqDto){
         return ResponseDto.of(routineService.modifyRoutine(reqDto));
     }
-
-
-
 }

@@ -58,15 +58,16 @@ public class MmrRoutnMgtRepoImpl implements MmrRoutnMgtRepoCustom {
                                 , mmrRoutnMgt.routnSeq.as("routineSequence")
                                 , mmrRoutnMgt.routnNm.as("routineName")
                                 , Projections.bean(CycleDto.class
-                                        , mmrRoutnDtlMgt.cycle.cycleCount
-                                        , mmrRoutnDtlMgt.cycle.cycleType
-                                        , mmrRoutnDtlMgt.cycle.mon
-                                        , mmrRoutnDtlMgt.cycle.tue
-                                        , mmrRoutnDtlMgt.cycle.wed
-                                        , mmrRoutnDtlMgt.cycle.thu
-                                        , mmrRoutnDtlMgt.cycle.fri
-                                        , mmrRoutnDtlMgt.cycle.sat
-                                        , mmrRoutnDtlMgt.cycle.sun).as("cycle")
+                                        , mmrRoutnDtlMgt.cycle.rpeCycTpCd.as("repeatCycleTypeCode")
+                                        , mmrRoutnDtlMgt.cycle.monYn.as("monday")
+                                        , mmrRoutnDtlMgt.cycle.tueYn.as("tuesday")
+                                        , mmrRoutnDtlMgt.cycle.wedYn.as("wednesday")
+                                        , mmrRoutnDtlMgt.cycle.thuYn.as("thursday")
+                                        , mmrRoutnDtlMgt.cycle.friYn.as("friday")
+                                        , mmrRoutnDtlMgt.cycle.satYn.as("saturday")
+                                        , mmrRoutnDtlMgt.cycle.sunYn.as("sunday")
+                                        , mmrRoutnDtlMgt.cycle.wkDcn.as("repeatCycleNum")
+                                ).as("repeatCycle")
                                 , Projections.bean(GoalDto.class
                                         , mmrRoutnDtlMgt.goal.golTpCd.as("goalTypeCode")
                                         , mmrRoutnDtlMgt.goal.golVal.as("goalValue")
@@ -108,22 +109,22 @@ public class MmrRoutnMgtRepoImpl implements MmrRoutnMgtRepoCustom {
         DayOfWeek dayOfWeek = searchDate.getDayOfWeek();
 
         if (dayOfWeek == DayOfWeek.MONDAY) {
-            return mmrRoutnDtlMgt.cycle.mon.eq(true).or(mmrRoutnDtlMgt.cycle.cycleType.eq(TIMES));
+            return mmrRoutnDtlMgt.cycle.monYn.eq("Y").or(mmrRoutnDtlMgt.cycle.rpeCycTpCd.eq(TIMES));
         } else if (dayOfWeek == DayOfWeek.TUESDAY) {
-            return mmrRoutnDtlMgt.cycle.tue.eq(true).or(mmrRoutnDtlMgt.cycle.cycleType.eq(TIMES));
+            return mmrRoutnDtlMgt.cycle.tueYn.eq("Y").or(mmrRoutnDtlMgt.cycle.rpeCycTpCd.eq(TIMES));
         } else if (dayOfWeek == DayOfWeek.WEDNESDAY) {
-            return mmrRoutnDtlMgt.cycle.wed.eq(true).or(mmrRoutnDtlMgt.cycle.cycleType.eq(TIMES));
+            return mmrRoutnDtlMgt.cycle.wedYn.eq("Y").or(mmrRoutnDtlMgt.cycle.rpeCycTpCd.eq(TIMES));
         } else if (dayOfWeek == DayOfWeek.THURSDAY) {
-            return mmrRoutnDtlMgt.cycle.thu.eq(true).or(mmrRoutnDtlMgt.cycle.cycleType.eq(TIMES));
+            return mmrRoutnDtlMgt.cycle.thuYn.eq("Y").or(mmrRoutnDtlMgt.cycle.rpeCycTpCd.eq(TIMES));
         } else if (dayOfWeek == DayOfWeek.FRIDAY) {
-            return mmrRoutnDtlMgt.cycle.fri.eq(true).or(mmrRoutnDtlMgt.cycle.cycleType.eq(TIMES));
+            return mmrRoutnDtlMgt.cycle.friYn.eq("Y").or(mmrRoutnDtlMgt.cycle.rpeCycTpCd.eq(TIMES));
         } else if (dayOfWeek == DayOfWeek.SATURDAY) {
-            return mmrRoutnDtlMgt.cycle.sat.eq(true).or(mmrRoutnDtlMgt.cycle.cycleType.eq(TIMES));
+            return mmrRoutnDtlMgt.cycle.satYn.eq("Y").or(mmrRoutnDtlMgt.cycle.rpeCycTpCd.eq(TIMES));
         } else if (dayOfWeek == DayOfWeek.SUNDAY) {
-            return mmrRoutnDtlMgt.cycle.sun.eq(true).or(mmrRoutnDtlMgt.cycle.cycleType.eq(TIMES));
+            return mmrRoutnDtlMgt.cycle.sunYn.eq("Y").or(mmrRoutnDtlMgt.cycle.rpeCycTpCd.eq(TIMES));
         }
 
-        return mmrRoutnDtlMgt.cycle.cycleType.eq(TIMES);
+        return mmrRoutnDtlMgt.cycle.rpeCycTpCd.eq(TIMES);
     }
 
     private BooleanExpression changeDateConditionForToday(String mmrId, LocalDate searchDate) {

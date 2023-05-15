@@ -23,9 +23,9 @@ public class CreateRoutineDetailReqDto {
     private String memberId;
     private Integer routineGroupSequence;
     private String routineGroupName;
-    private boolean alarm;
-    private LocalTime alarmTime;
-    private @Valid CycleDto cycle;
+    private String notificationStatus;
+    private LocalTime notificationTime;
+    private @Valid CycleDto repeatCycle;
     private @Valid GoalDto goal;
     @FutureOrPresent
     private LocalDate startDate;
@@ -36,19 +36,19 @@ public class CreateRoutineDetailReqDto {
             String routineName,
             String memberId,
             Integer routineGroupSequence,
-            boolean alarm,
-            CycleDto cycle,
+            String notificationStatus,
+            LocalTime notificationTime,
+            CycleDto repeatCycle,
             GoalDto goal,
-            LocalTime alarmTime,
             LocalDate startDate,
             LocalDate endDate) {
         this.routineName = routineName;
         this.memberId = memberId;
         this.routineGroupSequence = routineGroupSequence;
-        this.alarm = alarm;
-        this.cycle = cycle;
+        this.notificationStatus = notificationStatus;
+        this.notificationTime = notificationTime;
+        this.repeatCycle = repeatCycle;
         this.goal = goal;
-        this.alarmTime = alarmTime;
         this.startDate = startDate;
         this.endDate = endDate;
     }

@@ -51,11 +51,11 @@ public class MmrRoutnMgt extends BaseTimeEntity implements Persistable<MmrRoutnM
     private LocalDate endDate;
     private Integer soOrd;
     @Transient
-    private boolean alarm;
+    private String ntfYn;
     @Transient
-    private LocalTime alarmTime;
+    private LocalTime ntfTi;
     @Transient
-    private Cycle cycle;
+    private Cycle repeatCycle;
     @Transient
     private Goal goal;
 
@@ -82,10 +82,10 @@ public class MmrRoutnMgt extends BaseTimeEntity implements Persistable<MmrRoutnM
             String routnNm,
             Integer routnSeq,
             Member member,
-            boolean alarm,
+            String ntfYn,
+            LocalTime ntfTi,
             Cycle cycle,
             Goal goal,
-            LocalTime alarmTime,
             LocalDate startDate,
             LocalDate endDate,
             Integer displayOrder
@@ -95,10 +95,10 @@ public class MmrRoutnMgt extends BaseTimeEntity implements Persistable<MmrRoutnM
         mmrRoutnMgt.setRoutnNm(routnNm);
         mmrRoutnMgt.setRoutnSeq(routnSeq);
         mmrRoutnMgt.setMember(member);
-        mmrRoutnMgt.setAlarm(alarm);
-        mmrRoutnMgt.setCycle(cycle);
+        mmrRoutnMgt.setNtfYn(ntfYn);
+        mmrRoutnMgt.setNtfTi(ntfTi);
+        mmrRoutnMgt.setRepeatCycle(cycle);
         mmrRoutnMgt.setGoal(goal);
-        mmrRoutnMgt.setAlarmTime(alarmTime);
         mmrRoutnMgt.setStartDate(startDate);
         mmrRoutnMgt.setEndDate(endDate);
         mmrRoutnMgt.setSoOrd(Optional.ofNullable(displayOrder).orElse(1));
@@ -130,10 +130,10 @@ public class MmrRoutnMgt extends BaseTimeEntity implements Persistable<MmrRoutnM
 
         this.setRoutnNm(toBe.getRoutineName());
         this.setRoutnGrpSeq(toBe.getRoutineGroupSequence());
-        this.setAlarm(toBe.isAlarm());
-        this.setCycle(toBeCycle);
+        this.setNtfYn(toBe.getNotificationStatus());
+        this.setNtfTi(toBe.getNotificationTime());
+        this.setRepeatCycle(toBeCycle);
         this.setGoal(toBeGoal);
-        this.setAlarmTime(toBe.getAlarmTime());
         this.setStartDate(toBe.getStartDate());
         this.setEndDate(toBe.getEndDate());
     }

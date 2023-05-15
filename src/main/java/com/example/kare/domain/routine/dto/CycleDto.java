@@ -12,32 +12,32 @@ import javax.validation.constraints.Min;
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
 public class CycleDto {
-    private CycleType cycleType;
-    private boolean mon;
-    private boolean tue;
-    private boolean wed;
-    private boolean thu;
-    private boolean fri;
-    private boolean sat;
-    private boolean sun;
+    private CycleType repeatCycleTypeCode;
+    private String monday;
+    private String tuesday;
+    private String wednesday;
+    private String thursday;
+    private String friday;
+    private String saturday;
+    private String sunday;
     @Max(value = 7, message = "주별 회수의 최대 값은 7 입니다.")
     @Min(value = 1, message = "주별 회수의 최소 값은 1 입니다.")
-    private Integer cycleCount;
+    private Integer repeatCycleNum;
 
-    public CycleDto(CycleType cycleType, boolean mon, boolean tue, boolean wed, boolean thu, boolean fri, boolean sat, boolean sun) {
-        this.cycleType = cycleType;
-        this.mon = mon;
-        this.tue = tue;
-        this.wed = wed;
-        this.thu = thu;
-        this.fri = fri;
-        this.sat = sat;
-        this.sun = sun;
+    public CycleDto(CycleType repeatCycleTypeCode, String monday, String tuesday, String wednesday, String thursday, String friday, String saturday, String sunday) {
+        this.repeatCycleTypeCode = repeatCycleTypeCode;
+        this.monday = monday;
+        this.tuesday = tuesday;
+        this.wednesday = wednesday;
+        this.thursday = thursday;
+        this.friday = friday;
+        this.saturday = saturday;
+        this.sunday = sunday;
     }
 
-    public CycleDto(CycleType cycleType, Integer cycleCount) {
-        this.cycleType = cycleType;
-        this.cycleCount = cycleCount;
+    public CycleDto(CycleType repeatCycleTypeCode, Integer repeatCycleNum) {
+        this.repeatCycleTypeCode = repeatCycleTypeCode;
+        this.repeatCycleNum = repeatCycleNum;
     }
 
     public Cycle toEntity(){

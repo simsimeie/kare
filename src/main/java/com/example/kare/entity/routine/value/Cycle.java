@@ -20,64 +20,71 @@ import javax.persistence.Enumerated;
 @EqualsAndHashCode
 public class Cycle {
     @Enumerated(EnumType.STRING)
-    private CycleType cycleType;
-    private boolean mon;
-    private boolean tue;
-    private boolean wed;
-    private boolean thu;
-    private boolean fri;
-    private boolean sat;
-    private boolean sun;
-    private Integer cycleCount;
+    private CycleType rpeCycTpCd;
+    private String monYn;
+    private String tueYn;
+    private String wedYn;
+    private String thuYn;
+    private String friYn;
+    private String satYn;
+    private String sunYn;
+    private Integer wkDcn;
 
     private Cycle(CycleType cycleType, Integer cycleCount){
         if(null == cycleCount) throw new KBException("주당 일수 반복주기에는 주당 횟수 값이 들어와야 합니다.", ErrorCode.BAD_REQUEST);
 
-        this.cycleType = cycleType;
-        this.cycleCount = cycleCount;
+        this.rpeCycTpCd = cycleType;
+        this.wkDcn = cycleCount;
     }
 
-    private Cycle(CycleType cycleType, boolean mon, boolean tue, boolean wed, boolean thu, boolean fri, boolean sat, boolean sun) {
-        if(!(mon || tue || wed || thu || fri || sat || sun)) throw new KBException("특정 요일 반복주기에는 수행할 요일이 1건 이상은 들어와야 합니다.", ErrorCode.BAD_REQUEST);
+    private Cycle(CycleType cycleType, String mon, String tue, String wed, String thu, String fri, String sat, String sun) {
+        if(!(mon.equals("Y")
+                || tue.equals("Y")
+                || wed.equals("Y")
+                || thu.equals("Y")
+                || fri.equals("Y")
+                || sat.equals("Y")
+                || sun.equals("Y") )) throw new KBException("특정 요일 반복주기에는 수행할 요일이 1건 이상은 들어와야 합니다.", ErrorCode.BAD_REQUEST);
 
-        this.cycleType = cycleType;
-        this.mon = mon;
-        this.tue = tue;
-        this.wed = wed;
-        this.thu = thu;
-        this.fri = fri;
-        this.sat = sat;
-        this.sun = sun;
+        this.rpeCycTpCd = cycleType;
+        this.monYn = mon;
+        this.tueYn = tue;
+        this.wedYn = wed;
+        this.thuYn = thu;
+        this.friYn = fri;
+        this.satYn = sat;
+        this.sunYn = sun;
     }
 
     // ******** 생성 함수 ********
     public static Cycle createCycle(CycleDto cycleDto){
         checkValidCycleType(cycleDto);
 
-        if(cycleDto.getCycleType() == CycleType.DAY){
+        if(cycleDto.getRepeatCycleTypeCode() == CycleType.DAY){
             return new Cycle(
-                    cycleDto.getCycleType()
-                    , cycleDto.isMon()
-                    , cycleDto.isTue()
-                    , cycleDto.isWed()
-                    , cycleDto.isThu()
-                    , cycleDto.isFri()
-                    , cycleDto.isSat()
-                    , cycleDto.isSun()
+                    cycleDto.getRepeatCycleTypeCode()
+                    , cycleDto.getMonday()
+                    , cycleDto.getTuesday()
+                    , cycleDto.getWednesday()
+                    , cycleDto.getThursday()
+                    , cycleDto.getFriday()
+                    , cycleDto.getSaturday()
+                    , cycleDto.getSunday()
             );
-        } else if (cycleDto.getCycleType() == CycleType.TIMES) {
+        }
+        else if (cycleDto.getRepeatCycleTypeCode() == CycleType.TIMES) {
             return new Cycle(
-                    cycleDto.getCycleType()
-                    , cycleDto.getCycleCount()
+                    cycleDto.getRepeatCycleTypeCode()
+                    , cycleDto.getRepeatCycleNum()
             );
         } else {
-            throw new KBException( cycleDto.getCycleType() + " 주기에 대한 정책이 없습니다.", ErrorCode.BAD_REQUEST);
+            throw new KBException( cycleDto.getRepeatCycleTypeCode() + " 주기에 대한 정책이 없습니다.", ErrorCode.BAD_REQUEST);
         }
     }
 
     private static void checkValidCycleType(CycleDto cycleDto) {
         for(CycleType type : CycleType.values()){
-            if(type == cycleDto.getCycleType()) return;
+            if(type == cycleDto.getRepeatCycleTypeCode()) return;
         }
         throw new KBException("존재하지 않는 주기 형태입니다.", ErrorCode.BAD_REQUEST);
     }

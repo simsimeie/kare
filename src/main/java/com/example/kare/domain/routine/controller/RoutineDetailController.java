@@ -14,10 +14,10 @@ import javax.validation.Valid;
 public class RoutineDetailController {
     private final RoutineDetailService routineDetailService;
 
-    //TODO : Validation 체크 추가
-    @PostMapping("/create")
-    public ResponseDto<Void> inputRoutineAchievement(@RequestBody CreateRoutineAchieveReqDto reqDto){
-        routineDetailService.inputRoutineAchievement(reqDto);
+    //TODO : Validation 체크 추가 - 테스트의 어려움 때문에 @Valid 제거
+    @PostMapping("/save")
+    public ResponseDto<Void> saveRoutineAchievement(@RequestBody CreateRoutineAchieveReqDto reqDto){
+        routineDetailService.saveRoutineAchievement(reqDto);
         return ResponseDto.of(null);
     }
 

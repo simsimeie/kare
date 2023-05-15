@@ -17,5 +17,5 @@ public interface MmrRoutnMgtRepo extends JpaRepository<MmrRoutnMgt, MmrRoutnMgtI
 
     @Modifying(clearAutomatically = true)
     @Query("update MmrRoutnMgt r set r.routnGrpSeq = null where r.member.id = :mmrId and r.routnGrpSeq = :routnGrpSeq")
-    Integer bulkRoutineGroupSeqUpdateToNull(@Param("routnGrpSeq")Integer routnGrpSeq, @Param("mmrId")String mmrId);
+    Integer bulkUpdateRoutineGroupSeqToNull(@Param("routnGrpSeq")Integer routnGrpSeq, @Param("mmrId")String mmrId);
 }

@@ -32,8 +32,8 @@ public class ModifyRoutineReqDto {
     private String memberId;
     private Integer routineGroupSequence;
     private String routineGroupName;
-    private boolean alarm;
-    private LocalTime alarmTime;
+    private String notificationStatus;
+    private LocalTime notificationTime;
     private @Valid CycleDto cycle;
     private @Valid GoalDto goal;
     @FutureOrPresent
@@ -45,19 +45,19 @@ public class ModifyRoutineReqDto {
             String routineName,
             String memberId,
             Integer routineGroupSequence,
-            boolean alarm,
+            String notificationStatus,
+            LocalTime notificationTime,
             CycleDto cycle,
             GoalDto goal,
-            LocalTime alarmTime,
             LocalDate startDate,
             LocalDate endDate) {
         this.routineName = routineName;
         this.memberId = memberId;
         this.routineGroupSequence = routineGroupSequence;
-        this.alarm = alarm;
+        this.notificationStatus = notificationStatus;
+        this.notificationTime = notificationTime;
         this.cycle = cycle;
         this.goal = goal;
-        this.alarmTime = alarmTime;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -71,10 +71,10 @@ public class ModifyRoutineReqDto {
                 this.getRoutineName()
                 , routineSequence
                 , member
-                , this.isAlarm()
+                , this.getNotificationStatus()
+                , this.getNotificationTime()
                 , cycle
                 , goal
-                , this.getAlarmTime()
                 , this.getStartDate()
                 , this.getEndDate()
                 , sortOrder

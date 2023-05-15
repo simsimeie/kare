@@ -41,7 +41,7 @@ public class TodayService {
         todayRoutineList.forEach(dto -> routineDtoMap.put(dto.getRoutineSequence(), dto));
 
 
-        // TODO : 목표일 추출 로직
+        // 목표일 추출 로직
         // 이번주 시작일, 종료일 추출
         DateDto weekCriteria = calculator.getWeekCriteria(searchDate);
         // 시작일 ~ 종료일에 해당하는 루틴 상세 추출
@@ -53,38 +53,33 @@ public class TodayService {
         );
 
         // 상세 루프 돌면서
-        // max(루틴변경일자, 이번주 시작일, 루틴시작일) , min(다음루틴상세의 변경일자, 이번주 종료일, 루틴 종료일)
-        // TODO
+        // max(루틴변경일자, 이번주 시작일, 루틴시작일) <= 루틴상세변경일자 <= min(다음 루틴상세의 변경일자, 이번주 종료일, 루틴 종료일)
         Integer nextRoutineSeq = 0;
         LocalDate nextRoutineDetailChangeDate = LocalDate.of(9999, Month.DECEMBER, 31);
-        LocalDate firstDate;
-        LocalDate endDate = weekCriteria.getEndDate();
+        LocalDate startCriteria;
+        LocalDate endCriteria = weekCriteria.getEndDate();
 
         ListIterator<MmrRoutnDtlMgt> iterator = routineDetailList.listIterator(routineDetailList.size());
         while (iterator.hasPrevious()) {
             MmrRoutnDtlMgt routineDetail = iterator.previous();
 
-            firstDate = weekCriteria.getStartDate().isAfter(routineDetail.getRoutnChDt()) ? weekCriteria.getStartDate() : routineDetail.getRoutnChDt();
+            // max(루틴변경일자, 이번주 시작일)
+            startCriteria = weekCriteria.getStartDate().isAfter(routineDetail.getRoutnChDt()) ? weekCriteria.getStartDate() : routineDetail.getRoutnChDt();
 
             if (routineDetail.getRoutnSeq().equals(nextRoutineSeq)) {
-                endDate = endDate.isBefore(nextRoutineDetailChangeDate) ? endDate : nextRoutineDetailChangeDate.minusDays(1);
+                //min(다음 루틴상세의 변경일자, 이번주 종료일)
+                endCriteria = endCriteria.isBefore(nextRoutineDetailChangeDate) ? endCriteria : nextRoutineDetailChangeDate.minusDays(1);
             }
 
-            int targetDatesNum = routineDetail.getNumOfTargetDates(firstDate, endDate);
+            int targetDatesNum = routineDetail.getTargetDaysNum(startCriteria, endCriteria);
             RoutineResDto routineResDto = routineDtoMap.get(routineDetail.getRoutnSeq());
-            routineResDto.setGoalNumPerWeek(routineResDto.getGoalNumPerWeek() + targetDatesNum);
+            routineResDto.setTargetDaysNumPerWeek(routineResDto.getTargetDaysNumPerWeek() + targetDatesNum);
 
             nextRoutineSeq = routineDetail.getRoutnSeq();
             nextRoutineDetailChangeDate = routineDetail.getRoutnChDt();
         }
 
-//        for (MmrRoutnDtlMgt routineDetail : routineDetails) {
-//            int targetDatesNum = routineDetail.getNumOfTargetDates(weekCriteria.getStartDate(), weekCriteria.getEndDate());
-//            RoutineResDto routineResDto = routineDtoMap.get(routineDetail.getRoutnSeq());
-//            routineResDto.setTargetDatesNum(routineResDto.getTargetDatesNum() + targetDatesNum);
-//        }
-
-        // TODO : 달성일 추출 로직
+        // 달성일 추출 로직
         List<MmrRoutnAhvHis> completedAchievementList = mmrRoutnAchHisRepo.findCompletedAchievementList(
                 memberId,
                 weekCriteria.getStartDate(),
@@ -94,7 +89,7 @@ public class TodayService {
 
         completedAchievementList.forEach(achievement -> {
             RoutineResDto routineResDto = routineDtoMap.get(achievement.getRoutnSeq());
-            routineResDto.setCompletedNumPerWeek(routineResDto.getCompletedNumPerWeek() + 1);
+            routineResDto.setCompleteDaysNumPerWeek(routineResDto.getCompleteDaysNumPerWeek() + 1);
         });
 
 

@@ -82,10 +82,10 @@ public class RoutineService {
                 reqDto.getRoutineName(),
                 routineSeq,
                 member,
-                reqDto.isAlarm(),
-                reqDto.getCycle().toEntity(),
+                reqDto.getNotificationStatus(),
+                reqDto.getNotificationTime(),
+                reqDto.getRepeatCycle().toEntity(),
                 reqDto.getGoal().toEntity(),
-                reqDto.getAlarmTime(),
                 reqDto.getStartDate(),
                 reqDto.getEndDate(),
                 sortOrder
@@ -152,7 +152,7 @@ public class RoutineService {
 
     @Transactional
     public Integer modifyRoutineGroupSeqToNull(Integer routineGroupSeq,String memberId){
-        return mmrRoutnMgtRepo.bulkRoutineGroupSeqUpdateToNull(routineGroupSeq, memberId);
+        return mmrRoutnMgtRepo.bulkUpdateRoutineGroupSeqToNull(routineGroupSeq, memberId);
     }
 
 

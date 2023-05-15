@@ -47,7 +47,7 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
 
 
     private String routnNm;
-    private boolean ntfYn;
+    private String ntfYn;
     private LocalTime ntfTi;
     @Embedded
     private Cycle cycle;
@@ -90,7 +90,7 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
         routineHistory.setRoutnChDt(LocalDate.now());
         routineHistory.setRoutnSeq(mmrRoutnMgt.getRoutnSeq());
         routineHistory.setMmrId(mmrRoutnMgt.getMember().getId());
-        routineHistory.setCycle(mmrRoutnMgt.getCycle());
+        routineHistory.setCycle(mmrRoutnMgt.getRepeatCycle());
         routineHistory.setGoal(mmrRoutnMgt.getGoal());
         routineHistory.setStartDate(startDate);
         routineHistory.setEndDate(mmrRoutnMgt.getEndDate());
@@ -100,7 +100,7 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
 
     // ******** 비즈니스 로직 ********
     public boolean isShouldUpdateRoutineHistory(MmrRoutnMgt toBe) {
-        if (!this.getCycle().equals(toBe.getCycle())) {
+        if (!this.getCycle().equals(toBe.getRepeatCycle())) {
             return true;
         }
 
@@ -116,7 +116,7 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
     }
 
     public void modifyRoutineCharacter(MmrRoutnMgt toBe) {
-        this.setCycle(toBe.getCycle());
+        this.setCycle(toBe.getRepeatCycle());
         this.setGoal(toBe.getGoal());
     }
 
@@ -128,36 +128,69 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
         this.setEndDate(endDate);
     }
 
-    public int getNumOfTargetDates(LocalDate firstDate, LocalDate lastDate) {
-        LocalDate start = this.startDate.isAfter(firstDate) ? startDate : firstDate;
-        LocalDate end = this.endDate.isBefore(lastDate) ? endDate : lastDate;
+    public int getTargetDaysNum(LocalDate startCriteria, LocalDate endCriteria) {
+        // max(루틴변경일자, 이번주 시작일, 루틴시작일)
+        LocalDate from = this.startDate.isAfter(startCriteria) ? startDate : startCriteria;
+        LocalDate to = endCriteria;
+        // min(다음 루틴상세의 변경일자, 이번주 종료일, 루틴 종료일)
+        if (this.endDate != null) {
+            to = this.endDate.isBefore(endCriteria) ? endDate : endCriteria;
+        }
+
 
         final int weekDays = 7;
 
-        int days = Period.between(start, end).getDays() + 1;
+        int days = Period.between(from, to).getDays() + 1;
         // start > end 일 때
         if (days <= 0) {
             return 0;
         }
 
-        if (this.cycle.getCycleType() == CycleType.TIMES) {
-            return Math.round(days * this.cycle.getCycleCount() / weekDays);
-        } else if (this.cycle.getCycleType() == CycleType.DAY) {
-            return getTargetDates(start, end).size();
+        if (this.cycle.getRpeCycTpCd() == CycleType.TIMES) {
+            return Math.round(days * this.cycle.getWkDcn() / weekDays);
+        } else if (this.cycle.getRpeCycTpCd() == CycleType.DAY) {
+            return getTargetDateListForDayCycle(from, to).size();
         }
 
         return 0;
     }
 
-    public List<LocalDate> getTargetDates(LocalDate firstDate, LocalDate lastDate){
+    // 루틴상세에서는 TargetDates List를 내려줘야 한다.
+    public List<LocalDate> getTargetDates(LocalDate startCriteria, LocalDate endCriteria) {
+        // max(루틴변경일자, 이번주 시작일, 루틴시작일)
+        LocalDate from = this.startDate.isAfter(startCriteria) ? startDate : startCriteria;
+        LocalDate to = endCriteria;
+        // min(다음 루틴상세의 변경일자, 이번주 종료일, 루틴 종료일)
+        if (this.endDate != null) {
+            to = this.endDate.isBefore(endCriteria) ? endDate : endCriteria;
+        }
+
+        if (this.cycle.getRpeCycTpCd().equals(CycleType.TIMES)) {
+            return getTargetDateListForTimeCycle(from, to);
+        }
+        else if (this.cycle.getRpeCycTpCd().equals(CycleType.DAY)) {
+            return getTargetDateListForDayCycle(from, to);
+        }
+
+        return new ArrayList<>();
+    }
+
+    public List<LocalDate> getTargetDateListForTimeCycle(LocalDate from, LocalDate to) {
         List<LocalDate> targetDates = new ArrayList<>();
 
-        LocalDate start = this.startDate.isAfter(firstDate) ? startDate : firstDate;
-        LocalDate end = this.endDate.isBefore(lastDate) ? endDate : lastDate;
+        for (LocalDate index = from; !Period.between(index, to).isNegative(); index = index.plusDays(1)) {
+            targetDates.add(index);
+        }
 
-        for(LocalDate index = start; !Period.between(index, end).isNegative() ; index = index.plusDays(1)){
+        return targetDates;
+    }
+
+    public List<LocalDate> getTargetDateListForDayCycle(LocalDate from, LocalDate to) {
+        List<LocalDate> targetDates = new ArrayList<>();
+
+        for (LocalDate index = from; !Period.between(index, to).isNegative(); index = index.plusDays(1)) {
             DayOfWeek dayOfWeek = index.getDayOfWeek();
-            if(isTargetForDays(dayOfWeek)){
+            if (isTargetForDay(dayOfWeek)) {
                 targetDates.add(index);
             }
         }
@@ -165,21 +198,21 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
         return targetDates;
     }
 
-    public boolean isTargetForDays(DayOfWeek dayOfWeek) {
+    public boolean isTargetForDay(DayOfWeek dayOfWeek) {
         if (dayOfWeek == DayOfWeek.MONDAY) {
-            return this.cycle.isMon();
+            return this.cycle.getMonYn().equals("Y");
         } else if (dayOfWeek == DayOfWeek.TUESDAY) {
-            return this.cycle.isTue();
+            return this.cycle.getTueYn().equals("Y");
         } else if (dayOfWeek == DayOfWeek.WEDNESDAY) {
-            return this.cycle.isWed();
+            return this.cycle.getWedYn().equals("Y");
         } else if (dayOfWeek == DayOfWeek.THURSDAY) {
-            return this.cycle.isThu();
+            return this.cycle.getThuYn().equals("Y");
         } else if (dayOfWeek == DayOfWeek.FRIDAY) {
-            return this.cycle.isFri();
+            return this.cycle.getFriYn().equals("Y");
         } else if (dayOfWeek == DayOfWeek.SATURDAY) {
-            return this.cycle.isSat();
+            return this.cycle.getSatYn().equals("Y");
         } else if (dayOfWeek == DayOfWeek.SUNDAY) {
-            return this.cycle.isSun();
+            return this.cycle.getSunYn().equals("Y");
         }
 
         return false;
