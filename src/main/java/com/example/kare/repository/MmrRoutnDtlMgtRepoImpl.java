@@ -26,7 +26,7 @@ public class MmrRoutnDtlMgtRepoImpl implements MmrRoutnDtlMgtRepoCustom {
     }
 
     @Override
-    public LocalDate findValidRoutineChangeDate(Integer routnSeq, String mmrId, LocalDate searchDate) {
+    public LocalDate findValidRoutnChDt(Integer routnSeq, String mmrId, LocalDate searchDate) {
         return jpaQueryFactory
                 .select(mmrRoutnDtlMgt.routnChDt.max())
                 .from(mmrRoutnDtlMgt)
@@ -38,7 +38,7 @@ public class MmrRoutnDtlMgtRepoImpl implements MmrRoutnDtlMgtRepoCustom {
     }
 
     @Override
-    public Optional<MmrRoutnDtlMgt> findValidRoutineDetail(Integer routnSeq, String mmrId, LocalDate searchDate) {
+    public Optional<MmrRoutnDtlMgt> findValidRoutnDtl(Integer routnSeq, String mmrId, LocalDate searchDate) {
         return Optional.ofNullable(jpaQueryFactory
                 .select(mmrRoutnDtlMgt)
                 .from(mmrRoutnDtlMgt)
@@ -49,7 +49,7 @@ public class MmrRoutnDtlMgtRepoImpl implements MmrRoutnDtlMgtRepoCustom {
     }
 
     @Override
-    public List<MmrRoutnDtlMgt> findValidRoutineDetailList(String mmrId, LocalDate startDate, LocalDate endDate, Set<Integer> routnSeqSet) {
+    public List<MmrRoutnDtlMgt> findValidRoutnDtlList(String mmrId, LocalDate startDate, LocalDate endDate, Set<Integer> routnSeqSet) {
         List<Tuple> tuples = findValidRoutineDetailCondition(mmrId, startDate, routnSeqSet);
 
         return jpaQueryFactory

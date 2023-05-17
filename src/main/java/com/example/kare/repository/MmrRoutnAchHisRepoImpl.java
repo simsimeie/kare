@@ -21,7 +21,7 @@ public class MmrRoutnAchHisRepoImpl implements MmrRoutnAchHisRepoCustom {
     }
 
     @Override
-    public List<MmrRoutnAhvHis> findCompletedAchievementList(String mmrId, LocalDate startDate, LocalDate endDate, Set<Integer> routnSeqSet) {
+    public List<MmrRoutnAhvHis> findCompletedRoutnAchList(String mmrId, LocalDate startDate, LocalDate endDate, Set<Integer> routnSeqSet) {
         return jpaQueryFactory.select(mmrRoutnAhvHis)
                 .from(mmrRoutnAhvHis)
                 .where(mmrRoutnAhvHis.mmrId.eq(mmrId)

@@ -53,8 +53,8 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
     private Cycle cycle;
     @Embedded
     private Goal goal;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDate stDt;
+    private LocalDate enDt;
 
 
     // ******** 복합키 관련 처리 부분 ********
@@ -92,8 +92,8 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
         routineHistory.setMmrId(mmrRoutnMgt.getMember().getId());
         routineHistory.setCycle(mmrRoutnMgt.getRepeatCycle());
         routineHistory.setGoal(mmrRoutnMgt.getGoal());
-        routineHistory.setStartDate(startDate);
-        routineHistory.setEndDate(mmrRoutnMgt.getEndDate());
+        routineHistory.setStDt(startDate);
+        routineHistory.setEnDt(mmrRoutnMgt.getEndDate());
 
         return routineHistory;
     }
@@ -108,7 +108,7 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
             return true;
         }
 
-        if (!this.getStartDate().equals(toBe.getStartDate())) {
+        if (!this.getStDt().equals(toBe.getStartDate())) {
             return true;
         }
 
@@ -121,20 +121,20 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
     }
 
     public void modifyRoutineDetailStartDate(LocalDate startDate) {
-        this.setStartDate(startDate);
+        this.setStDt(startDate);
     }
 
     public void modifyRoutineDetailEndDate(LocalDate endDate) {
-        this.setEndDate(endDate);
+        this.setEnDt(endDate);
     }
 
     public int getTargetDaysNum(LocalDate startCriteria, LocalDate endCriteria) {
         // max(루틴변경일자, 이번주 시작일, 루틴시작일)
-        LocalDate from = this.startDate.isAfter(startCriteria) ? startDate : startCriteria;
+        LocalDate from = this.stDt.isAfter(startCriteria) ? this.stDt : startCriteria;
         LocalDate to = endCriteria;
         // min(다음 루틴상세의 변경일자, 이번주 종료일, 루틴 종료일)
-        if (this.endDate != null) {
-            to = this.endDate.isBefore(endCriteria) ? endDate : endCriteria;
+        if (this.enDt != null) {
+            to = this.enDt.isBefore(endCriteria) ? this.enDt : endCriteria;
         }
 
 
@@ -158,11 +158,11 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
     // 루틴상세에서는 TargetDates List를 내려줘야 한다.
     public List<LocalDate> getTargetDates(LocalDate startCriteria, LocalDate endCriteria) {
         // max(루틴변경일자, 이번주 시작일, 루틴시작일)
-        LocalDate from = this.startDate.isAfter(startCriteria) ? startDate : startCriteria;
+        LocalDate from = this.stDt.isAfter(startCriteria) ? this.stDt : startCriteria;
         LocalDate to = endCriteria;
         // min(다음 루틴상세의 변경일자, 이번주 종료일, 루틴 종료일)
-        if (this.endDate != null) {
-            to = this.endDate.isBefore(endCriteria) ? endDate : endCriteria;
+        if (this.enDt != null) {
+            to = this.enDt.isBefore(endCriteria) ? this.enDt : endCriteria;
         }
 
         if (this.cycle.getRpeCycTpCd().equals(CycleType.TIMES)) {

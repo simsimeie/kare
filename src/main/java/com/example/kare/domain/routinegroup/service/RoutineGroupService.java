@@ -116,7 +116,7 @@ public class RoutineGroupService {
     public void removeRoutineGroup(DeleteRoutineGroupReqDto reqDto){
         MmrRoutnGrpMgt routineGroup = findRoutineGroup(reqDto.getRoutineGroupSequence(), reqDto.getMemberId());
 
-        mmrRoutnMgtRepo.bulkUpdateRoutineGroupSeqToNull(reqDto.getRoutineGroupSequence(),reqDto.getMemberId());
+        mmrRoutnMgtRepo.bulkUpdateRoutnGrpSeqToNull(reqDto.getRoutineGroupSequence(),reqDto.getMemberId());
         mmrRoutnGrpMgtRepo.delete(routineGroup);
     }
 

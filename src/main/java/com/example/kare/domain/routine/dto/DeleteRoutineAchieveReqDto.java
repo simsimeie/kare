@@ -14,5 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 public class DeleteRoutineAchieveReqDto {
     private List<Integer> routineList;
+    private String memberId;
     private LocalDate requestDate;
 }

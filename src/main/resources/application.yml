@@ -4,6 +4,9 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+  sql:
+    init:
+      mode: always
 
     #url: jdbc:postgresql://url:5432/kare
     #username: postgres
@@ -17,6 +20,7 @@ spring:
         # show_sql: true
         format_sql: true
         default_batch_fetch_size: 100
+    defer-datasource-initialization: true
 
 logging.level:
   org.hibernate.SQL: debug

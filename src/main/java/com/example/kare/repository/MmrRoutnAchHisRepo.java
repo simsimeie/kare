@@ -15,7 +15,7 @@ public interface MmrRoutnAchHisRepo extends JpaRepository<MmrRoutnAhvHis, MmrRou
     Optional<MmrRoutnAhvHis> findById(MmrRoutnAhvHisId id);
     @Modifying(clearAutomatically = true)
     @Query("delete from MmrRoutnAhvHis mra where mra.routnSeq in :routnSeqList and mra.mmrId = :mmrId and mra.routnAhvDt = :reqDt")
-    Integer bulkDeleteRoutineAchievement(@Param("routnSeqList") List<Integer> routnSeqList,
-                                         @Param("mmrId")String mmrId,
-                                         @Param("reqDt")LocalDate reqDt);
+    Integer bulkDeleteRoutnAhv(@Param("routnSeqList") List<Integer> routnSeqList,
+                               @Param("mmrId")String mmrId,
+                               @Param("reqDt")LocalDate reqDt);
 }

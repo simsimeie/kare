@@ -32,7 +32,7 @@ public class MmrRoutnMgtRepoImpl implements MmrRoutnMgtRepoCustom {
         this.jpaQueryFactory = new JPAQueryFactory(em);
     }
 
-    public Integer findActiveRoutineNum(String mmrId) {
+    public Integer findActiveRoutnNum(String mmrId) {
         LocalDate now = LocalDate.now();
 
         return jpaQueryFactory
@@ -40,7 +40,7 @@ public class MmrRoutnMgtRepoImpl implements MmrRoutnMgtRepoCustom {
                 .from(mmrRoutnMgt)
                 .join(mmrRoutnDtlMgt).on(mmrRoutnMgt.member.id.eq(mmrRoutnDtlMgt.mmrId).and(mmrRoutnMgt.routnSeq.eq(mmrRoutnDtlMgt.routnSeq)))
                 .where(mmrRoutnMgt.member.id.eq(mmrId)
-                        .and(mmrRoutnDtlMgt.endDate.goe(now))
+                        .and(mmrRoutnDtlMgt.enDt.goe(now))
                         .and(changeDateConditionForToday(mmrId, now))
                 )
                 .fetchOne()
@@ -49,7 +49,7 @@ public class MmrRoutnMgtRepoImpl implements MmrRoutnMgtRepoCustom {
 
 
     @Override
-    public List<RoutineResDto> findTodayRoutines(String mmrId, LocalDate searchDate) {
+    public List<RoutineResDto> findTodayRoutnList(String mmrId, LocalDate searchDate) {
 
 
         List<RoutineResDto> routines = jpaQueryFactory
@@ -96,7 +96,7 @@ public class MmrRoutnMgtRepoImpl implements MmrRoutnMgtRepoCustom {
                 .on(mmrRoutnMgt.routnSeq.eq(mmrRoutnGrpMgt.routnGrpSeq)
                         .and(mmrRoutnMgt.member.id.eq(mmrRoutnGrpMgt.member.id)))
                 .where(mmrRoutnMgt.member.id.eq(mmrId)
-                        .and(mmrRoutnDtlMgt.endDate.goe(searchDate))
+                        .and(mmrRoutnDtlMgt.enDt.goe(searchDate))
                         .and(cycleCondition(searchDate, mmrRoutnDtlMgt))
                         .and(changeDateConditionForToday(mmrId, searchDate))
                 )

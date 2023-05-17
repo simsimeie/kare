@@ -3,7 +3,6 @@ package com.example.kare.repository;
 import com.example.kare.entity.routine.MmrRoutnDtlMgt;
 import com.example.kare.entity.routine.id.MmrRoutnDtlMgtId;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -18,6 +17,6 @@ public interface MmrRoutnDtlMgtRepo extends JpaRepository<MmrRoutnDtlMgt, MmrRou
                                         "where rdm2.routnSeq = :routnSeq " +
                                         "and rdm2.mmrId = :mmrId)"
     )
-    MmrRoutnDtlMgt findActiveRoutineDetail(@Param("routnSeq")Integer routnSeq, @Param("mmrId")String mmrId);
+    MmrRoutnDtlMgt findActiveRoutnDtl(@Param("routnSeq")Integer routnSeq, @Param("mmrId")String mmrId);
 
 }

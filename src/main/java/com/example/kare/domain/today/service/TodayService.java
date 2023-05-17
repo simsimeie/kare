@@ -34,7 +34,7 @@ public class TodayService {
         Map<Integer, List<RoutineResDto>> mapByRoutineGroup = new HashMap<>();
         Map<String, Object> result = new HashMap<>();
 
-        List<RoutineResDto> todayRoutineList = mmrRoutnMgtRepo.findTodayRoutines(memberId, searchDate);
+        List<RoutineResDto> todayRoutineList = mmrRoutnMgtRepo.findTodayRoutnList(memberId, searchDate);
 
         // 루틴Sequence 기준 Map 생성
         Map<Integer, RoutineResDto> routineDtoMap = new HashMap<>();
@@ -45,7 +45,7 @@ public class TodayService {
         // 이번주 시작일, 종료일 추출
         DateDto weekCriteria = calculator.getWeekCriteria(searchDate);
         // 시작일 ~ 종료일에 해당하는 루틴 상세 추출
-        List<MmrRoutnDtlMgt> routineDetailList = mmrRoutnDtlMgtRepo.findValidRoutineDetailList(
+        List<MmrRoutnDtlMgt> routineDetailList = mmrRoutnDtlMgtRepo.findValidRoutnDtlList(
                 memberId,
                 weekCriteria.getStartDate(),
                 weekCriteria.getEndDate(),
@@ -80,7 +80,7 @@ public class TodayService {
         }
 
         // 달성일 추출 로직
-        List<MmrRoutnAhvHis> completedAchievementList = mmrRoutnAchHisRepo.findCompletedAchievementList(
+        List<MmrRoutnAhvHis> completedAchievementList = mmrRoutnAchHisRepo.findCompletedRoutnAchList(
                 memberId,
                 weekCriteria.getStartDate(),
                 weekCriteria.getEndDate(),

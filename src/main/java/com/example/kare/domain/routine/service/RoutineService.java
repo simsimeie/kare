@@ -4,7 +4,6 @@ import com.example.kare.common.constant.ErrorCode;
 import com.example.kare.common.exception.KBException;
 import com.example.kare.domain.routine.dto.CreateRoutineDetailReqDto;
 import com.example.kare.domain.routine.dto.CreateRoutineReqDto;
-import com.example.kare.domain.today.dto.RoutineGroupResDto;
 import com.example.kare.domain.today.dto.*;
 import com.example.kare.domain.today.service.CommonService;
 import com.example.kare.domain.today.service.MemberService;
@@ -67,7 +66,7 @@ public class RoutineService {
     }
 
     protected void validationCheck(String mmrId, Integer routineSizeToAdd) {
-        Integer activeRoutineNum = mmrRoutnMgtRepo.findActiveRoutineNum(mmrId);
+        Integer activeRoutineNum = mmrRoutnMgtRepo.findActiveRoutnNum(mmrId);
         if (limit < activeRoutineNum + routineSizeToAdd) {
             throw new KBException(limit + "개 이하의 루틴만 등록 가능합니다.", ErrorCode.BAD_REQUEST);
         }
@@ -109,7 +108,7 @@ public class RoutineService {
             // start date가 변경된 경우에는 현재 < 변경할 start date && Last History start date 경우만 고려하면 된다.
             // 즉, start date가 변경되었다는 것은 아직 시작되지 않은 미래의 루틴을 변경했다는 의미로 history 테이블엔 row 1줄만 존재
             // 따라서, start date가 변경된 경우에는 업데이트만 해주면 된다.
-            if (!routineDetail.getStartDate().equals(mmrRoutnMgt.getStartDate())) {
+            if (!routineDetail.getStDt().equals(mmrRoutnMgt.getStartDate())) {
                 routineDetail.modifyRoutineCharacter(mmrRoutnMgt);
                 routineDetail.modifyRoutineDetailStartDate(mmrRoutnMgt.getStartDate());
                 //routineHistoryRepository.save(routineHistory);
@@ -135,7 +134,7 @@ public class RoutineService {
     }
 
     private MmrRoutnDtlMgt findActiveRoutineDetail(MmrRoutnMgt mmrRoutnMgt) {
-        MmrRoutnDtlMgt active = mmrRoutnDtlMgtRepo.findActiveRoutineDetail(
+        MmrRoutnDtlMgt active = mmrRoutnDtlMgtRepo.findActiveRoutnDtl(
                 mmrRoutnMgt.getRoutnSeq(),
                 mmrRoutnMgt.getMember().getId()
         );
@@ -152,7 +151,7 @@ public class RoutineService {
 
     @Transactional
     public Integer modifyRoutineGroupSeqToNull(Integer routineGroupSeq,String memberId){
-        return mmrRoutnMgtRepo.bulkUpdateRoutineGroupSeqToNull(routineGroupSeq, memberId);
+        return mmrRoutnMgtRepo.bulkUpdateRoutnGrpSeqToNull(routineGroupSeq, memberId);
     }
 
 

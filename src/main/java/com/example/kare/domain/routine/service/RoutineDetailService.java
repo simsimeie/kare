@@ -4,12 +4,12 @@ import com.example.kare.common.constant.ErrorCode;
 import com.example.kare.common.exception.KBException;
 import com.example.kare.domain.routine.dto.CreateRoutineAchieveDetailReqDto;
 import com.example.kare.domain.routine.dto.CreateRoutineAchieveReqDto;
+import com.example.kare.domain.routine.dto.DeleteRoutineAchieveReqDto;
 import com.example.kare.entity.routine.MmrRoutnAhvHis;
 import com.example.kare.entity.routine.MmrRoutnDtlMgt;
-import com.example.kare.entity.routine.MmrRoutnMgt;
 import com.example.kare.entity.routine.constant.AchieveStatus;
+import com.example.kare.entity.routine.constant.CycleType;
 import com.example.kare.entity.routine.id.MmrRoutnAhvHisId;
-import com.example.kare.entity.routine.id.MmrRoutnMgtId;
 import com.example.kare.repository.MmrRoutnAchHisRepo;
 import com.example.kare.repository.MmrRoutnDtlMgtRepo;
 import com.example.kare.repository.MmrRoutnMgtRepo;
@@ -25,7 +25,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RoutineDetailService {
-    private final MmrRoutnMgtRepo mmrRoutnMgtRepo;
     private final MmrRoutnDtlMgtRepo mmrRoutnDtlMgtRepo;
     private final MmrRoutnAchHisRepo mmrRoutnAchHisRepo;
 
@@ -35,12 +34,12 @@ public class RoutineDetailService {
         String memberId = createRoutineAchieveReqDto.getMemberId();
 
         for (CreateRoutineAchieveDetailReqDto reqDto : createRoutineAchieveReqDto.getRoutineList()) {
-            Optional<MmrRoutnDtlMgt> routineDetailResult = mmrRoutnDtlMgtRepo.findValidRoutineDetail(
+            Optional<MmrRoutnDtlMgt> routineDetailResult = mmrRoutnDtlMgtRepo.findValidRoutnDtl(
                     reqDto.getRoutineSequence(),
                     memberId,
                     requestDate
             );
-            if(routineDetailResult.isEmpty()){
+            if (routineDetailResult.isEmpty()) {
                 throw new KBException("루틴 시작일 이후의 루틴에 대해서만 완료가 가능합니다.", ErrorCode.BAD_REQUEST);
             }
 
@@ -69,19 +68,35 @@ public class RoutineDetailService {
                     || !reqDto.getGoal().getGoalTypeCode().equals(1)) {
                 throw new KBException("설정하신 목표유형,단위로만 입력하실 수 있습니다.", ErrorCode.BAD_REQUEST);
             }
-        }
-        else {
+        } else {
             if (!routineDetail.getGoal().getGolUnitTpCd().equals(reqDto.getGoal().getGoalUnitTypeCode())
                     || !routineDetail.getGoal().getGolTpCd().equals(reqDto.getGoal().getGoalTypeCode())) {
                 throw new KBException("설정하신 목표유형,단위로만 입력하실 수 있습니다.", ErrorCode.BAD_REQUEST);
             }
         }
 
-        if (Period.between(routineDetail.getStartDate(), requestDate).isNegative()){
+        if (Period.between(routineDetail.getStDt(), requestDate).isNegative()) {
             throw new KBException("루틴 시작일 이후의 루틴에 대해서만 완료가 가능합니다.", ErrorCode.BAD_REQUEST);
         }
 
+        if (routineDetail.getCycle().getRpeCycTpCd() == CycleType.DAY) {
+            if(!isTargetForDay(routineDetail, requestDate)){
+                throw new KBException("등록하신 루틴 주기에 해당하는 날짜가 아닙니다.", ErrorCode.BAD_REQUEST);
+            }
+        }
+    }
 
+    public boolean isTargetForDay(MmrRoutnDtlMgt routineDetail, LocalDate requestDate) {
+        return
+                switch (requestDate.getDayOfWeek()) {
+                    case MONDAY -> routineDetail.getCycle().getMonYn().equals("Y") ? true : false;
+                    case TUESDAY -> routineDetail.getCycle().getTueYn().equals("Y") ? true : false;
+                    case WEDNESDAY -> routineDetail.getCycle().getWedYn().equals("Y") ? true : false;
+                    case THURSDAY -> routineDetail.getCycle().getThuYn().equals("Y") ? true : false;
+                    case FRIDAY -> routineDetail.getCycle().getFriYn().equals("Y") ? true : false;
+                    case SATURDAY -> routineDetail.getCycle().getSatYn().equals("Y") ? true : false;
+                    case SUNDAY -> routineDetail.getCycle().getSunYn().equals("Y") ? true : false;
+                };
     }
 
     private Optional<MmrRoutnAhvHis> findRoutineAchievement(MmrRoutnDtlMgt routineDetail, LocalDate requestDate) {
@@ -132,12 +147,9 @@ public class RoutineDetailService {
     }
 
 
-
     @Transactional
-    public void deleteRoutine(Integer routnSeq, String memberId) {
-        Optional<MmrRoutnMgt> routine = mmrRoutnMgtRepo.findById(new MmrRoutnMgtId(routnSeq, memberId));
-        if (routine.isPresent()) {
-            mmrRoutnMgtRepo.delete(routine.get());
-        }
+    public void removeRoutineAchievement(DeleteRoutineAchieveReqDto reqDto){
+        mmrRoutnAchHisRepo.bulkDeleteRoutnAhv(reqDto.getRoutineList(), reqDto.getMemberId(), reqDto.getRequestDate());
     }
+
 }

@@ -16,7 +16,7 @@ import javax.validation.Valid;
 public class RoutineController {
     private final RoutineService routineService;
     @PostMapping("/create")
-    public ResponseDto<Integer> createRoutine(@RequestBody @Valid CreateRoutineReqDto reqDto){
+    public ResponseDto<Integer> inputRoutine(@RequestBody @Valid CreateRoutineReqDto reqDto){
         return ResponseDto.of(routineService.inputRoutine(reqDto));
     }
     @PutMapping("/update")
