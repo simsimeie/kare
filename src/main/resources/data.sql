@@ -46,6 +46,18 @@ insert into RECI_ROUTN_MGT (RECI_ROUTN_SEQ, routn_nm, reci_routn_dsc, ntf_yn, nt
 values (6, '경제신문읽기', '경제신문읽기', 'Y', '05:00:00', 'TIMES', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 3, 1, null, null,
         '2023-05-01', '2024-12-31', now(), now());
 
+insert into RECI_ROUTN_MGT (RECI_ROUTN_SEQ, routn_nm, reci_routn_dsc, ntf_yn, ntf_ti, rpe_cyc_tp_cd, mon_yn, tue_yn,
+                            wed_yn, thu_yn, fri_yn, sat_yn, sun_yn, wk_dcn, gol_tp_cd, gol_unit_tp_cd, gol_val, st_dt,
+                            en_dt, reg_dtm, chg_dtm)
+values (7, '부동산임장', '부동산임장', 'Y', '05:00:00', 'TIMES', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 1, 1, null, null,
+        '2023-05-01', '2024-12-31', now(), now());
+
+insert into RECI_ROUTN_MGT (RECI_ROUTN_SEQ, routn_nm, reci_routn_dsc, ntf_yn, ntf_ti, rpe_cyc_tp_cd, mon_yn, tue_yn,
+                            wed_yn, thu_yn, fri_yn, sat_yn, sun_yn, wk_dcn, gol_tp_cd, gol_unit_tp_cd, gol_val, st_dt,
+                            en_dt, reg_dtm, chg_dtm)
+values (8, '코인정보찾기', '코인정보찾기', 'Y', '05:00:00', 'TIMES', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 7, 1, null, null,
+        '2023-05-01', '2024-12-31', now(), now());
+
 insert into RECI_ROUTN_CATG_MGT(reci_routn_catg_seq, catg_nm, catg_dsc, so_odr, reg_dtm, chg_dtm)
 values (1, '운동', '운동', 1, now(), now());
 insert into RECI_ROUTN_CATG_MGT(reci_routn_catg_seq, catg_nm, catg_dsc, so_odr, reg_dtm, chg_dtm)
@@ -78,3 +90,9 @@ values (5, 5, 1, now(), now());
 
 insert into RECI_ROUTN_CATG_MP(reci_routn_catg_seq, reci_routn_seq, so_ord, reg_dtm, chg_dtm)
 values (6, 6, 1, now(), now());
+
+insert into RECI_ROUTN_CATG_MP(reci_routn_catg_seq, reci_routn_seq, so_ord, reg_dtm, chg_dtm)
+values (6, 7, 2, now(), now());
+
+insert into RECI_ROUTN_CATG_MP(reci_routn_catg_seq, reci_routn_seq, so_ord, reg_dtm, chg_dtm)
+values (6, 8, 3, now(), now());

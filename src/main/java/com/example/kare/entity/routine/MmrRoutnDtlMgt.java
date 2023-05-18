@@ -1,9 +1,7 @@
 package com.example.kare.entity.routine;
 
-import com.example.kare.domain.calendar.service.Calculator;
 import com.example.kare.entity.BaseTimeEntity;
 import com.example.kare.entity.routine.constant.CycleType;
-import com.example.kare.entity.routine.id.MmrRoutnAhvHisId;
 import com.example.kare.entity.routine.id.MmrRoutnDtlMgtId;
 import com.example.kare.entity.routine.value.Cycle;
 import com.example.kare.entity.routine.value.Goal;
@@ -19,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Entity
@@ -129,18 +128,19 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
     }
 
     public int getTargetDaysNum(LocalDate startCriteria, LocalDate endCriteria) {
+        final int weekDays = 7;
+
         // max(루틴변경일자, 이번주 시작일, 루틴시작일)
         LocalDate from = this.stDt.isAfter(startCriteria) ? this.stDt : startCriteria;
         LocalDate to = endCriteria;
+
         // min(다음 루틴상세의 변경일자, 이번주 종료일, 루틴 종료일)
         if (this.enDt != null) {
             to = this.enDt.isBefore(endCriteria) ? this.enDt : endCriteria;
         }
 
-
-        final int weekDays = 7;
-
         int days = Period.between(from, to).getDays() + 1;
+
         // start > end 일 때
         if (days <= 0) {
             return 0;
@@ -160,6 +160,7 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
         // max(루틴변경일자, 이번주 시작일, 루틴시작일)
         LocalDate from = this.stDt.isAfter(startCriteria) ? this.stDt : startCriteria;
         LocalDate to = endCriteria;
+
         // min(다음 루틴상세의 변경일자, 이번주 종료일, 루틴 종료일)
         if (this.enDt != null) {
             to = this.enDt.isBefore(endCriteria) ? this.enDt : endCriteria;
@@ -217,6 +218,5 @@ public class MmrRoutnDtlMgt extends BaseTimeEntity implements Persistable<MmrRou
 
         return false;
     }
-
 
 }

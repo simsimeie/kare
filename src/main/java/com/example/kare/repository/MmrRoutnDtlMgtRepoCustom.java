@@ -8,8 +8,10 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface MmrRoutnDtlMgtRepoCustom {
-    LocalDate findValidRoutnChDt(Integer routnSeq, String mmrId, LocalDate searchDate);
-    Optional<MmrRoutnDtlMgt> findValidRoutnDtl(Integer routnSeq, String mmrId, LocalDate searchDate);
-    List<MmrRoutnDtlMgt> findValidRoutnDtlList(String mmrId, LocalDate startDate, LocalDate LastDate, Set<Integer> routnSeqSet);
+    LocalDate findValidRoutnChDt(String mmrId, Integer routnSeq, LocalDate searchDate);
+    Optional<MmrRoutnDtlMgt> findValidRoutnDtl(String mmrId, Integer routnSeq, LocalDate searchDate);
+    List<MmrRoutnDtlMgt> findValidRoutnDtlList(String mmrId, LocalDate startDate, LocalDate endDate, Set<Integer> routnSeqSet);
+
+
 
 }

@@ -20,7 +20,7 @@ import static org.mockito.BDDMockito.given;
 @ExtendWith(MockitoExtension.class)
 class RoutineDetailServiceTest {
     @InjectMocks
-    private RoutineDetailService routineDetailService;
+    private RoutineAchievementService routineDetailService;
     @Mock
     private MmrRoutnDtlMgt routineDetail;
     @Mock

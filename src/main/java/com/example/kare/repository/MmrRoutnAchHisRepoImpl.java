@@ -21,13 +21,12 @@ public class MmrRoutnAchHisRepoImpl implements MmrRoutnAchHisRepoCustom {
     }
 
     @Override
-    public List<MmrRoutnAhvHis> findCompletedRoutnAchList(String mmrId, LocalDate startDate, LocalDate endDate, Set<Integer> routnSeqSet) {
+    public List<MmrRoutnAhvHis> findRoutnAchList(String mmrId, LocalDate startDate, LocalDate endDate, Set<Integer> routnSeqSet) {
         return jpaQueryFactory.select(mmrRoutnAhvHis)
                 .from(mmrRoutnAhvHis)
                 .where(mmrRoutnAhvHis.mmrId.eq(mmrId)
                         .and(mmrRoutnAhvHis.routnAhvDt.between(startDate, endDate))
                         .and(mmrRoutnAhvHis.routnSeq.in(routnSeqSet))
-                        .and(mmrRoutnAhvHis.golAhvYn.eq(AchieveStatus.Y))
                 )
                 .fetch();
     }

@@ -2,9 +2,12 @@ package com.example.kare.domain.routine.service;
 
 import com.example.kare.common.constant.ErrorCode;
 import com.example.kare.common.exception.KBException;
+import com.example.kare.domain.calendar.dto.DateDto;
+import com.example.kare.domain.calendar.service.CalendarService;
 import com.example.kare.domain.routine.dto.CreateRoutineAchieveDetailReqDto;
 import com.example.kare.domain.routine.dto.CreateRoutineAchieveReqDto;
 import com.example.kare.domain.routine.dto.DeleteRoutineAchieveReqDto;
+import com.example.kare.domain.today.dto.RoutineResDto;
 import com.example.kare.entity.routine.MmrRoutnAhvHis;
 import com.example.kare.entity.routine.MmrRoutnDtlMgt;
 import com.example.kare.entity.routine.constant.AchieveStatus;
@@ -12,21 +15,24 @@ import com.example.kare.entity.routine.constant.CycleType;
 import com.example.kare.entity.routine.id.MmrRoutnAhvHisId;
 import com.example.kare.repository.MmrRoutnAchHisRepo;
 import com.example.kare.repository.MmrRoutnDtlMgtRepo;
-import com.example.kare.repository.MmrRoutnMgtRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.Period;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RoutineDetailService {
+@Slf4j
+public class RoutineAchievementService {
     private final MmrRoutnDtlMgtRepo mmrRoutnDtlMgtRepo;
     private final MmrRoutnAchHisRepo mmrRoutnAchHisRepo;
+    private final CalendarService calendarService;
 
     @Transactional
     public void saveRoutineAchievement(CreateRoutineAchieveReqDto createRoutineAchieveReqDto) {
@@ -35,8 +41,8 @@ public class RoutineDetailService {
 
         for (CreateRoutineAchieveDetailReqDto reqDto : createRoutineAchieveReqDto.getRoutineList()) {
             Optional<MmrRoutnDtlMgt> routineDetailResult = mmrRoutnDtlMgtRepo.findValidRoutnDtl(
-                    reqDto.getRoutineSequence(),
                     memberId,
+                    reqDto.getRoutineSequence(),
                     requestDate
             );
             if (routineDetailResult.isEmpty()) {
@@ -146,10 +152,45 @@ public class RoutineDetailService {
         );
     }
 
-
     @Transactional
     public void removeRoutineAchievement(DeleteRoutineAchieveReqDto reqDto){
         mmrRoutnAchHisRepo.bulkDeleteRoutnAhv(reqDto.getRoutineList(), reqDto.getMemberId(), reqDto.getRequestDate());
     }
+
+
+    public void findMonthlyAchievement(String memberid, Integer routineSeq, LocalDate searchDate){
+        DateDto monthCriteria = calendarService.getMonthCriteria(searchDate);
+
+        List<MmrRoutnDtlMgt> validRoutnDtlList = mmrRoutnDtlMgtRepo.findValidRoutnDtlList(memberid, monthCriteria.getStartDate(), monthCriteria.getEndDate(), Set.of(routineSeq));
+
+        int targetDaysNum=0;
+        List<LocalDate> targetDates = new ArrayList<>();
+
+        if(!validRoutnDtlList.isEmpty()) {
+            MmrRoutnDtlMgt validRoutineDetail = validRoutnDtlList.get(validRoutnDtlList.size() - 1);
+
+            LocalDate nextRoutineDetailChangeDate = LocalDate.of(9999, Month.DECEMBER, 31);
+            LocalDate startCriteria;
+            LocalDate endCriteria = monthCriteria.getEndDate();
+
+            ListIterator<MmrRoutnDtlMgt> iterator = validRoutnDtlList.listIterator(validRoutnDtlList.size());
+
+            while (iterator.hasPrevious()) {
+                MmrRoutnDtlMgt routineDetail = iterator.previous();
+                // max(루틴변경일자, 이번주 시작일)
+                startCriteria = monthCriteria.getStartDate().isAfter(routineDetail.getRoutnChDt()) ? monthCriteria.getStartDate() : routineDetail.getRoutnChDt();
+                //min(다음 루틴상세의 변경일자, 이번주 종료일)
+                endCriteria = endCriteria.isBefore(nextRoutineDetailChangeDate) ? endCriteria : nextRoutineDetailChangeDate.minusDays(1);
+
+                targetDaysNum += routineDetail.getTargetDaysNum(startCriteria, endCriteria);
+                targetDates.addAll(routineDetail.getTargetDates(startCriteria, endCriteria));
+
+                nextRoutineDetailChangeDate = routineDetail.getRoutnChDt();
+            }
+
+        }
+
+    }
+
 
 }

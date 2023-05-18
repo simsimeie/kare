@@ -19,12 +19,13 @@ public class RoutineGroupResDto {
     private Integer completeRoutineNum;
     private boolean routineGroupCompleteStatus;
     private Integer sortOrder;
-    private List<RoutineResDto> routines = new ArrayList<>();
+    private List<RoutineResDto> routineList = new ArrayList<>();
 
 
-    public RoutineGroupResDto(Integer routineGroupSequence, String routineGroupName) {
-        this.routineGroupSequence = routineGroupSequence;
-        this.routineGroupName = routineGroupName;
+    public RoutineGroupResDto(RoutineResDto routineResDto) {
+        this.routineGroupSequence = routineResDto.getRoutineGroupSequence();
+        this.routineGroupName = routineResDto.getRoutineName();
+        this.sortOrder = routineResDto.getRoutineGroupSortOrder();
     }
 
 }

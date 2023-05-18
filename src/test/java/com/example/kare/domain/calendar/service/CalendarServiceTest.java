@@ -9,12 +9,12 @@ import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CalculatorTest {
+class CalendarServiceTest {
 
     @Test
     @DisplayName("주초 주말을 잘가져오는지 테스트")
     public void getWeekCriteriaTest01(){
-        Calculator calculator = new Calculator();
+        CalendarService calculator = new CalendarService();
         //given && when
         DateDto weekCriteria = calculator.getWeekCriteria(LocalDate.of(2023, Month.JUNE, 1));
         //then

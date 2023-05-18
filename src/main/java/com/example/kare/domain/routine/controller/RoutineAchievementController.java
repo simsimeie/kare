@@ -3,17 +3,15 @@ package com.example.kare.domain.routine.controller;
 import com.example.kare.common.dto.ResponseDto;
 import com.example.kare.domain.routine.dto.CreateRoutineAchieveReqDto;
 import com.example.kare.domain.routine.dto.DeleteRoutineAchieveReqDto;
-import com.example.kare.domain.routine.service.RoutineDetailService;
+import com.example.kare.domain.routine.service.RoutineAchievementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/routine-achievement")
-public class RoutineDetailController {
-    private final RoutineDetailService routineDetailService;
+public class RoutineAchievementController {
+    private final RoutineAchievementService routineDetailService;
 
     //TODO : Validation 체크 추가 - 테스트의 어려움 때문에 @Valid 제거
     @PostMapping("/save")

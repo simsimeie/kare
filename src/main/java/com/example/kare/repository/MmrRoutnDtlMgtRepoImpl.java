@@ -26,24 +26,24 @@ public class MmrRoutnDtlMgtRepoImpl implements MmrRoutnDtlMgtRepoCustom {
     }
 
     @Override
-    public LocalDate findValidRoutnChDt(Integer routnSeq, String mmrId, LocalDate searchDate) {
+    public LocalDate findValidRoutnChDt(String mmrId, Integer routnSeq, LocalDate searchDate) {
         return jpaQueryFactory
                 .select(mmrRoutnDtlMgt.routnChDt.max())
                 .from(mmrRoutnDtlMgt)
-                .where(mmrRoutnDtlMgt.routnSeq.eq(routnSeq)
-                        .and(mmrRoutnDtlMgt.mmrId.eq(mmrId))
+                .where(mmrRoutnDtlMgt.mmrId.eq(mmrId)
+                        .and(mmrRoutnDtlMgt.routnSeq.eq(routnSeq))
                         .and(mmrRoutnDtlMgt.routnChDt.loe(searchDate))
                 )
                 .fetchOne();
     }
 
     @Override
-    public Optional<MmrRoutnDtlMgt> findValidRoutnDtl(Integer routnSeq, String mmrId, LocalDate searchDate) {
+    public Optional<MmrRoutnDtlMgt> findValidRoutnDtl(String mmrId, Integer routnSeq, LocalDate searchDate) {
         return Optional.ofNullable(jpaQueryFactory
                 .select(mmrRoutnDtlMgt)
                 .from(mmrRoutnDtlMgt)
-                .where(mmrRoutnDtlMgt.routnSeq.eq(routnSeq)
-                        .and(mmrRoutnDtlMgt.mmrId.eq(mmrId))
+                .where(mmrRoutnDtlMgt.mmrId.eq(mmrId)
+                        .and(mmrRoutnDtlMgt.routnSeq.eq(routnSeq))
                         .and(changeDateCondition(routnSeq, mmrId, searchDate))
                 ).fetchOne());
     }
@@ -56,6 +56,7 @@ public class MmrRoutnDtlMgtRepoImpl implements MmrRoutnDtlMgtRepoCustom {
                 .select(mmrRoutnDtlMgt)
                 .from(mmrRoutnDtlMgt)
                 .where(mmrRoutnDtlMgt.mmrId.eq(mmrId)
+                        .and(mmrRoutnDtlMgt.routnSeq.in(routnSeqSet))
                         .and(mmrRoutnDtlMgt.routnChDt.loe(endDate))
                         .and(changeDateConditions(tuples))
                 )

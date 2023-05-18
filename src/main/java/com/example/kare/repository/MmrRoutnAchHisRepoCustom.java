@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.Set;
 
 public interface MmrRoutnAchHisRepoCustom {
-    List<MmrRoutnAhvHis> findCompletedRoutnAchList(String mmrId, LocalDate startDate, LocalDate endDate, Set<Integer> routnSeqSet);
+    List<MmrRoutnAhvHis> findRoutnAchList(String mmrId, LocalDate startDate, LocalDate endDate, Set<Integer> routnSeqSet);
 }

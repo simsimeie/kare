@@ -1,7 +1,7 @@
 package com.example.kare.domain.today.service;
 
 import com.example.kare.domain.calendar.dto.DateDto;
-import com.example.kare.domain.calendar.service.Calculator;
+import com.example.kare.domain.calendar.service.CalendarService;
 import com.example.kare.domain.today.dto.RoutineGroupResDto;
 import com.example.kare.domain.today.dto.RoutineResDto;
 import com.example.kare.entity.routine.MmrRoutnAhvHis;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,30 +27,73 @@ public class TodayService {
     private final MmrRoutnMgtRepo mmrRoutnMgtRepo;
     private final MmrRoutnDtlMgtRepo mmrRoutnDtlMgtRepo;
     private final MmrRoutnAchHisRepo mmrRoutnAchHisRepo;
-    private final Calculator calculator;
+    private final CalendarService calculator;
 
     public Map<String, Object> findTodayRoutines(String memberId, LocalDate searchDate) {
         List<RoutineResDto> routineList = new ArrayList<>();
-        Set<RoutineGroupResDto> routineGroupSet = new HashSet<>();
-        Map<Integer, List<RoutineResDto>> mapByRoutineGroup = new HashMap<>();
         Map<String, Object> result = new HashMap<>();
 
+        //TODO : 대상건이 없을 때 처리 방법
         List<RoutineResDto> todayRoutineList = mmrRoutnMgtRepo.findTodayRoutnList(memberId, searchDate);
 
-        // 루틴Sequence 기준 Map 생성
-        Map<Integer, RoutineResDto> routineDtoMap = new HashMap<>();
-        todayRoutineList.forEach(dto -> routineDtoMap.put(dto.getRoutineSequence(), dto));
-
-
-        // 목표일 추출 로직
         // 이번주 시작일, 종료일 추출
         DateDto weekCriteria = calculator.getWeekCriteria(searchDate);
+
+        // 루틴Sequence 기준 Map 생성 - 루틴 시퀀스로 RoutineResDto 추출하기 위함
+        Map<Integer, RoutineResDto> todayRoutineMap = new HashMap<>();
+        todayRoutineList.forEach(routineResDto -> todayRoutineMap.put(routineResDto.getRoutineSequence(), routineResDto));
+
+        // 목표일 추출 로직
+        calculateTargetDaysNum(memberId, todayRoutineMap, weekCriteria);
+
+        // 달성일 추출 로직
+        calculateCompleteDaysNum(memberId, todayRoutineMap, weekCriteria);
+
+        // Grouping
+        // key : 루틴그룹Sequence value : 루틴그룹에 포함된 루틴 List
+        Map<Integer, List<RoutineResDto>> routineMapByRoutineGroup = new HashMap<>();
+        Set<RoutineGroupResDto> routineGroupSet = new HashSet<>();
+
+        todayRoutineList.forEach(routine -> {
+            if (null != routine.getRoutineGroupSequence()) {
+                routineGroupSet.add(new RoutineGroupResDto(routine));
+                List<RoutineResDto> list = Optional.ofNullable(routineMapByRoutineGroup.get(routine.getRoutineGroupSequence())).orElseGet(ArrayList::new);
+                list.add(routine);
+                routineMapByRoutineGroup.put(routine.getRoutineGroupSequence(), list);
+            } else {
+                routineList.add(routine);
+            }
+        });
+
+        // 그룹 정보 생성
+        for (RoutineGroupResDto group : routineGroupSet) {
+            List<RoutineResDto> routineListInGroup = routineMapByRoutineGroup.get(group.getRoutineGroupSequence());
+            group.setRoutineList(routineListInGroup);
+
+            group.setTotalRoutineNum(routineListInGroup.size());
+
+            group.setCompleteRoutineNum(
+                    (int) routineListInGroup.stream()
+                            .filter(routineResDto -> routineResDto.isAchievementStatus() == true).count()
+            );
+
+            boolean completeStatus = group.getTotalRoutineNum() <= group.getCompleteRoutineNum() ? true : false;
+            group.setRoutineGroupCompleteStatus(completeStatus);
+        }
+
+        result.put("routineList", routineList);
+        result.put("routineGroupList", routineGroupSet);
+
+        return result;
+    }
+    private void calculateTargetDaysNum(String memberId, Map<Integer, RoutineResDto> todayRoutineMap, DateDto weekCriteria) {
+        // 목표일 추출 로직
         // 시작일 ~ 종료일에 해당하는 루틴 상세 추출
         List<MmrRoutnDtlMgt> routineDetailList = mmrRoutnDtlMgtRepo.findValidRoutnDtlList(
                 memberId,
                 weekCriteria.getStartDate(),
                 weekCriteria.getEndDate(),
-                routineDtoMap.keySet()
+                todayRoutineMap.keySet()
         );
 
         // 상세 루프 돌면서
@@ -71,59 +115,31 @@ public class TodayService {
                 endCriteria = endCriteria.isBefore(nextRoutineDetailChangeDate) ? endCriteria : nextRoutineDetailChangeDate.minusDays(1);
             }
 
-            int targetDatesNum = routineDetail.getTargetDaysNum(startCriteria, endCriteria);
-            RoutineResDto routineResDto = routineDtoMap.get(routineDetail.getRoutnSeq());
-            routineResDto.setTargetDaysNumPerWeek(routineResDto.getTargetDaysNumPerWeek() + targetDatesNum);
+            int targetDaysNum = routineDetail.getTargetDaysNum(startCriteria, endCriteria);
+
+            RoutineResDto routineResDto = todayRoutineMap.get(routineDetail.getRoutnSeq());
+            routineResDto.setTargetDaysNumPerWeek(routineResDto.getTargetDaysNumPerWeek() + targetDaysNum);
 
             nextRoutineSeq = routineDetail.getRoutnSeq();
             nextRoutineDetailChangeDate = routineDetail.getRoutnChDt();
         }
+    }
 
-        // 달성일 추출 로직
-        List<MmrRoutnAhvHis> completedAchievementList = mmrRoutnAchHisRepo.findCompletedRoutnAchList(
+    private void calculateCompleteDaysNum(String memberId, Map<Integer, RoutineResDto> todayRoutineMap, DateDto weekCriteria) {
+        List<MmrRoutnAhvHis> routineAchievementList = mmrRoutnAchHisRepo.findRoutnAchList(
                 memberId,
                 weekCriteria.getStartDate(),
                 weekCriteria.getEndDate(),
-                routineDtoMap.keySet()
+                todayRoutineMap.keySet()
         );
 
-        completedAchievementList.forEach(achievement -> {
-            RoutineResDto routineResDto = routineDtoMap.get(achievement.getRoutnSeq());
+        List<MmrRoutnAhvHis> completed = routineAchievementList.stream()
+                .filter(achievement -> achievement.getGolAhvYn().equals("Y"))
+                .collect(Collectors.toList());
+
+        completed.forEach(achievement -> {
+            RoutineResDto routineResDto = todayRoutineMap.get(achievement.getRoutnSeq());
             routineResDto.setCompleteDaysNumPerWeek(routineResDto.getCompleteDaysNumPerWeek() + 1);
         });
-
-
-        // Grouping
-        todayRoutineList.forEach(routine -> {
-            if (null != routine.getRoutineGroupSequence()) {
-                routineGroupSet.add(new RoutineGroupResDto(routine.getRoutineGroupSequence(), routine.getRoutineGroupName()));
-                List<RoutineResDto> list = Optional.ofNullable(mapByRoutineGroup.get(routine.getRoutineGroupSequence())).orElseGet(ArrayList::new);
-                list.add(routine);
-                mapByRoutineGroup.put(routine.getRoutineGroupSequence(), list);
-            } else {
-                routineList.add(routine);
-            }
-        });
-
-        for (RoutineGroupResDto group : routineGroupSet) {
-            List<RoutineResDto> routinesInGroup = mapByRoutineGroup.get(group.getRoutineGroupSequence());
-            group.setRoutines(routinesInGroup);
-            group.setTotalRoutineNum(routinesInGroup.size());
-            group.setCompleteRoutineNum(
-                    (int) routinesInGroup
-                            .stream()
-                            .filter(routineResDto -> routineResDto.isAchievementStatus() == true)
-                            .count()
-            );
-
-            boolean completeStatus = group.getTotalRoutineNum() <= group.getCompleteRoutineNum() ? true : false;
-            group.setRoutineGroupCompleteStatus(completeStatus);
-            group.setSortOrder(routinesInGroup.get(0).getRoutineGroupSortOrder());
-        }
-
-        result.put("routineList", routineList);
-        result.put("routineGroupList", routineGroupSet);
-
-        return result;
     }
 }
