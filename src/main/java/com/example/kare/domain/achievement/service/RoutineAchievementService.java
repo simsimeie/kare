@@ -1,18 +1,17 @@
-package com.example.kare.domain.routine.service;
+package com.example.kare.domain.achievement.service;
 
 import com.example.kare.common.constant.ErrorCode;
 import com.example.kare.common.exception.KBException;
-import com.example.kare.domain.calendar.dto.DateDto;
+import com.example.kare.domain.achievement.dto.*;
+import com.example.kare.domain.calendar.dto.SearchCriteriaDto;
+import com.example.kare.domain.calendar.dto.StatisticsDto;
 import com.example.kare.domain.calendar.service.CalendarService;
-import com.example.kare.domain.routine.dto.CreateRoutineAchieveDetailReqDto;
-import com.example.kare.domain.routine.dto.CreateRoutineAchieveReqDto;
-import com.example.kare.domain.routine.dto.DeleteRoutineAchieveReqDto;
-import com.example.kare.domain.today.dto.RoutineResDto;
 import com.example.kare.entity.routine.MmrRoutnAhvHis;
 import com.example.kare.entity.routine.MmrRoutnDtlMgt;
 import com.example.kare.entity.routine.constant.AchieveStatus;
 import com.example.kare.entity.routine.constant.CycleType;
 import com.example.kare.entity.routine.id.MmrRoutnAhvHisId;
+import com.example.kare.entity.routine.value.Goal;
 import com.example.kare.repository.MmrRoutnAchHisRepo;
 import com.example.kare.repository.MmrRoutnDtlMgtRepo;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.Period;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,11 +34,11 @@ public class RoutineAchievementService {
     private final CalendarService calendarService;
 
     @Transactional
-    public void saveRoutineAchievement(CreateRoutineAchieveReqDto createRoutineAchieveReqDto) {
-        LocalDate requestDate = createRoutineAchieveReqDto.getRequestDate();
-        String memberId = createRoutineAchieveReqDto.getMemberId();
+    public void saveRoutineAchievement(CreateAchievementReqDto createAchievementReqDto) {
+        LocalDate requestDate = createAchievementReqDto.getRequestDate();
+        String memberId = createAchievementReqDto.getMemberId();
 
-        for (CreateRoutineAchieveDetailReqDto reqDto : createRoutineAchieveReqDto.getRoutineList()) {
+        for (CreateAchievementDetailReqDto reqDto : createAchievementReqDto.getRoutineList()) {
             Optional<MmrRoutnDtlMgt> routineDetailResult = mmrRoutnDtlMgtRepo.findValidRoutnDtl(
                     memberId,
                     reqDto.getRoutineSequence(),
@@ -65,7 +64,7 @@ public class RoutineAchievementService {
     }
 
     public void validationCheck(MmrRoutnDtlMgt routineDetail,
-                                CreateRoutineAchieveDetailReqDto reqDto,
+                                CreateAchievementDetailReqDto reqDto,
                                 LocalDate requestDate) {
 
         if (routineDetail.getGoal().getGolTpCd().equals(1)) {
@@ -86,7 +85,7 @@ public class RoutineAchievementService {
         }
 
         if (routineDetail.getCycle().getRpeCycTpCd() == CycleType.DAY) {
-            if(!isTargetForDay(routineDetail, requestDate)){
+            if (!isTargetForDay(routineDetail, requestDate)) {
                 throw new KBException("등록하신 루틴 주기에 해당하는 날짜가 아닙니다.", ErrorCode.BAD_REQUEST);
             }
         }
@@ -116,7 +115,7 @@ public class RoutineAchievementService {
     }
 
     private void updateRoutineAchievement(MmrRoutnDtlMgt routineDetail,
-                                          CreateRoutineAchieveDetailReqDto reqDto,
+                                          CreateAchievementDetailReqDto reqDto,
                                           MmrRoutnAhvHis achievement) {
         if (routineDetail.getGoal().getGolTpCd().equals(1)) {
             achievement.setGoalAchievementStatus(AchieveStatus.Y);
@@ -132,7 +131,7 @@ public class RoutineAchievementService {
     }
 
     private MmrRoutnAhvHis createRoutineAchievement(MmrRoutnDtlMgt routineDetail,
-                                                    CreateRoutineAchieveDetailReqDto achievementDto,
+                                                    CreateAchievementDetailReqDto achievementDto,
                                                     LocalDate requestDate) {
         AchieveStatus status = AchieveStatus.N;
 
@@ -153,44 +152,83 @@ public class RoutineAchievementService {
     }
 
     @Transactional
-    public void removeRoutineAchievement(DeleteRoutineAchieveReqDto reqDto){
+    public void removeRoutineAchievement(DeleteAchievementReqDto reqDto) {
         mmrRoutnAchHisRepo.bulkDeleteRoutnAhv(reqDto.getRoutineList(), reqDto.getMemberId(), reqDto.getRequestDate());
     }
 
+    public RetrieveAchievementResDto findBasicAchievement(CommonAchievementReqDto reqDto){
+        Optional<MmrRoutnDtlMgt> activeOpt = mmrRoutnDtlMgtRepo.findValidRoutnDtl(
+                reqDto.getMemberId(),
+                reqDto.getRoutineSequence(),
+                LocalDate.now()
+        );
 
-    public void findMonthlyAchievement(String memberid, Integer routineSeq, LocalDate searchDate){
-        DateDto monthCriteria = calendarService.getMonthCriteria(searchDate);
-
-        List<MmrRoutnDtlMgt> validRoutnDtlList = mmrRoutnDtlMgtRepo.findValidRoutnDtlList(memberid, monthCriteria.getStartDate(), monthCriteria.getEndDate(), Set.of(routineSeq));
-
-        int targetDaysNum=0;
-        List<LocalDate> targetDates = new ArrayList<>();
-
-        if(!validRoutnDtlList.isEmpty()) {
-            MmrRoutnDtlMgt validRoutineDetail = validRoutnDtlList.get(validRoutnDtlList.size() - 1);
-
-            LocalDate nextRoutineDetailChangeDate = LocalDate.of(9999, Month.DECEMBER, 31);
-            LocalDate startCriteria;
-            LocalDate endCriteria = monthCriteria.getEndDate();
-
-            ListIterator<MmrRoutnDtlMgt> iterator = validRoutnDtlList.listIterator(validRoutnDtlList.size());
-
-            while (iterator.hasPrevious()) {
-                MmrRoutnDtlMgt routineDetail = iterator.previous();
-                // max(루틴변경일자, 이번주 시작일)
-                startCriteria = monthCriteria.getStartDate().isAfter(routineDetail.getRoutnChDt()) ? monthCriteria.getStartDate() : routineDetail.getRoutnChDt();
-                //min(다음 루틴상세의 변경일자, 이번주 종료일)
-                endCriteria = endCriteria.isBefore(nextRoutineDetailChangeDate) ? endCriteria : nextRoutineDetailChangeDate.minusDays(1);
-
-                targetDaysNum += routineDetail.getTargetDaysNum(startCriteria, endCriteria);
-                targetDates.addAll(routineDetail.getTargetDates(startCriteria, endCriteria));
-
-                nextRoutineDetailChangeDate = routineDetail.getRoutnChDt();
-            }
-
+        if(activeOpt.isPresent()) {
+            MmrRoutnDtlMgt activeRoutineDetail = activeOpt.get();
+            return new RetrieveAchievementResDto(activeRoutineDetail);
         }
 
+        return new RetrieveAchievementResDto();
     }
 
 
+    public void findMonthlyAchievementStat(String memberId, Integer routineSeq, LocalDate searchDate) {
+        SearchCriteriaDto monthCriteria = calendarService.getMonthCriteria(searchDate);
+
+        List<MmrRoutnDtlMgt> validRoutnDtlList = mmrRoutnDtlMgtRepo.findValidRoutnDtlList(
+                memberId,
+                monthCriteria.getStartDate(),
+                monthCriteria.getEndDate(),
+                Set.of(routineSeq)
+        );
+
+
+        Map<Integer, StatisticsDto> targetStatMap = calendarService.calculateTargetStat(memberId, validRoutnDtlList, monthCriteria);
+
+        List<MmrRoutnAhvHis> routineAchievementList = mmrRoutnAchHisRepo.findRoutnAchList(
+                memberId,
+                monthCriteria.getStartDate(),
+                monthCriteria.getEndDate(),
+                Set.of(routineSeq)
+        );
+
+        List<MmrRoutnAhvHis> completed = routineAchievementList.stream()
+                .filter(achievement -> achievement.getGolAhvYn() == AchieveStatus.Y)
+                .collect(Collectors.toList());
+
+        Map<Integer, StatisticsDto> completeStatMap = calendarService.calculateCompleteStat(memberId, completed);
+
+
+
+        Optional<MmrRoutnDtlMgt> activeOpt = mmrRoutnDtlMgtRepo.findValidRoutnDtl(
+                memberId,
+                routineSeq,
+                LocalDate.now()
+        );
+
+        if(activeOpt.isPresent()){
+            MmrRoutnDtlMgt activeRoutineDetail = activeOpt.get();
+
+
+            //
+            List<MmrRoutnAhvHis> achievementListForGraph = routineAchievementList.stream().filter(achievement ->
+                    achievement.getGoal().getGolUnitTpCd() == activeRoutineDetail.getGoal().getGolUnitTpCd()
+                            && achievement.getGoal().getGolTpCd().equals(activeRoutineDetail.getGoal().getGolTpCd())
+            ).collect(Collectors.toList());
+
+            int max = 0;
+            double average = 0.0;
+            // 최고, 평균 계산
+            if (!activeRoutineDetail.getGoal().getGolTpCd().equals(1)) {
+                OptionalInt maxOpt = achievementListForGraph.stream().map(MmrRoutnAhvHis::getGoal).mapToInt(Goal::getGolVal).max();
+                if (maxOpt.isPresent()) max = maxOpt.getAsInt();
+                log.info("max : {}", max);
+
+                OptionalDouble averageOpt = achievementListForGraph.stream().map(MmrRoutnAhvHis::getGoal).mapToInt(Goal::getGolVal).average();
+                if (averageOpt.isPresent()) average = averageOpt.getAsDouble();
+                log.info("average : {}", average);
+            }
+        }
+
+    }
 }

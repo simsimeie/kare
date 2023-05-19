@@ -1,12 +1,10 @@
-package com.example.kare.domain.routine.dto;
+package com.example.kare.domain.achievement.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.Valid;
-import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,10 +12,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
-public class CreateRoutineAchieveReqDto {
+public class DeleteAchievementReqDto {
+    private List<Integer> routineList;
     private String memberId;
-    private @Valid List<CreateRoutineAchieveDetailReqDto> routineList;
-    @PastOrPresent
     private LocalDate requestDate;
-
 }

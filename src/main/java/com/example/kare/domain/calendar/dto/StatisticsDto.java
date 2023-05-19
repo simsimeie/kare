@@ -6,12 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "of")
-public class DateDto {
-    private LocalDate startDate;
-    private LocalDate endDate;
+public class StatisticsDto {
+    private int num;
+    private List<LocalDate> dateList = new ArrayList<>();
 }

@@ -1,6 +1,6 @@
 package com.example.kare.domain.calendar.service;
 
-import com.example.kare.domain.calendar.dto.DateDto;
+import com.example.kare.domain.calendar.dto.SearchCriteriaDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ class CalendarServiceTest {
     public void getWeekCriteriaTest01(){
         CalendarService calculator = new CalendarService();
         //given && when
-        DateDto weekCriteria = calculator.getWeekCriteria(LocalDate.of(2023, Month.JUNE, 1));
+        SearchCriteriaDto weekCriteria = calculator.getWeekCriteria(LocalDate.of(2023, Month.JUNE, 1));
         //then
         assertEquals(LocalDate.of(2023,Month.MAY,29), weekCriteria.getStartDate());
         assertEquals(LocalDate.of(2023,Month.JUNE,4), weekCriteria.getEndDate());
